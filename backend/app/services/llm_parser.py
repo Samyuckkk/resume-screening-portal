@@ -46,7 +46,8 @@ Resume:
             "Content-Type": "application/json"
         },
         json={
-            "model": "google/gemma-4-31b-it:free",
+            # "model": "google/gemma-4-31b-it:free",
+            "model": "openai/gpt-3.5-turbo",
             "messages": [
                 {
                     "role": "user",
