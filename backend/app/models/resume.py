@@ -15,6 +15,8 @@ class Resume(Base):
 
     file_url = Column(String)
 
+    parsed_text = Column(String)
+
     skills = Column(String)
 
     education = Column(String)
