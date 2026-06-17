@@ -20,3 +20,13 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    user: UserResponse
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
