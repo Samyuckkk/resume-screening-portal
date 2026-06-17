@@ -13,6 +13,11 @@ class Interview(Base):
         ForeignKey("applications.id")
     )
 
+    recruiter_id = Column(
+        Integer,
+        ForeignKey("users.id")
+    )
+
     interview_date = Column(String)
 
     interview_time = Column(String)
