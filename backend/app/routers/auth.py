@@ -18,7 +18,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
 
 security = HTTPBearer()
 router = APIRouter()
-VALID_ROLES = {"recruiter", "applicant"}
+VALID_ROLES = {"recruiter", "applicant", "admin"}
 
 
 def hash_password(password: str) -> str:
