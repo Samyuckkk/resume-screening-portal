@@ -8,6 +8,10 @@ class InterviewCreate(BaseModel):
     meeting_link: str
 
 
+class FeedbackUpdate(BaseModel):
+    feedback: str
+
+
 class InterviewResponse(BaseModel):
     id: int
     application_id: int
