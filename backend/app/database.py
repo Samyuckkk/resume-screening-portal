@@ -5,7 +5,7 @@ import os
 
 load_dotenv()
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(
     SUPABASE_URL,
