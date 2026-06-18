@@ -17,8 +17,25 @@ from app.routers.applications import router as applications_router
 from app.routers.resumes import router as resumes_router
 from app.routers.interviews import router as interviews_router
 
+from fastapi.middleware.cors import CORSMiddleware
+import os
+
 app = FastAPI(
     title="Resume Screening Portal"
+)
+
+# Configure CORS Middleware
+allowed_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173,https://resume-screening-portal.onrender.com"
+).split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 Base.metadata.create_all(bind=engine)

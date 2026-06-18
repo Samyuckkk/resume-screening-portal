@@ -10,7 +10,8 @@ def upload_resume_to_storage(file):
 
     response = supabase.storage.from_("resumes").upload(
         file_name,
-        file_bytes
+        file_bytes,
+        file_options={"content-type": "application/pdf"}
     )
 
     public_url = supabase.storage.from_("resumes").get_public_url(
