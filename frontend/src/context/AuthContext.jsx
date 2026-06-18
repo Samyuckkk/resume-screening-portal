@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Restore session on mount
+  // Restore session on mount and listen to auth expiry events
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -21,6 +21,14 @@ export const AuthProvider = ({ children }) => {
       }
     };
     checkSession();
+
+    const handleUnauthorized = () => {
+      setUser(null);
+    };
+    window.addEventListener('api-unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('api-unauthorized', handleUnauthorized);
+    };
   }, []);
 
   const login = async (email, password) => {
