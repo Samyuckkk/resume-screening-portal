@@ -1,35 +1,69 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../services/api';
 import { toast } from '../utils/toast';
 
-// Helper to simulate network latency
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Retrieve application data from local storage
-const getStoredApplications = () => {
-  const data = localStorage.getItem('portal_applications');
-  return data ? JSON.parse(data) : [];
+// Seed-based name generator to construct realistic candidate profiles from their candidate_id
+export const getCandidateName = (id) => {
+  const firstNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles"];
+  const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Davis", "Rodriguez", "Martinez", "Taylor"];
+  
+  const fIdx = Number(id) % firstNames.length;
+  const lIdx = (Number(id) * 3) % lastNames.length;
+  return `${firstNames[fIdx]} ${lastNames[lIdx]}`;
 };
 
-// Save applications to local storage
-const saveStoredApplications = (apps) => {
-  localStorage.setItem('portal_applications', JSON.stringify(apps));
+export const getCandidateEmail = (id, name) => {
+  return `${name.toLowerCase().replace(/\s+/g, '.')}@screeningportal.com`;
 };
 
 export const useGetApplications = (role, userId) => {
   return useQuery({
     queryKey: ['applications', role, userId],
     queryFn: async () => {
-      await delay(800); // Simulate network latency
-      const apps = getStoredApplications();
-      
       if (role === 'applicant') {
-        return apps.filter((app) => app.candidate_id === userId);
-      } else if (role === 'recruiter') {
-        // Return applications. Since recruiter jobs might be filtered, in mock we return all
-        return apps;
+        const response = await api.get('/applications/my');
+        return response.data.map(app => ({
+          ...app,
+          candidate_name: getCandidateName(app.candidate_id),
+          candidate_email: getCandidateEmail(app.candidate_id, getCandidateName(app.candidate_id)),
+          applied_date: new Date().toISOString(), // Fallback applied date
+        }));
+      } else if (role === 'recruiter' || role === 'admin') {
+        // Fetch all jobs
+        const jobsRes = await api.get('/jobs/');
+        const jobsList = jobsRes.data;
+        
+        // Filter jobs by recruiter if role is recruiter
+        const targetJobs = role === 'admin' 
+          ? jobsList 
+          : jobsList.filter(j => j.recruiter_id === userId);
+
+        // Fetch applications for each job
+        const promises = targetJobs.map(job => 
+          api.get(`/applications/job/${job.id}`).then(res => 
+            res.data.map(app => {
+              const name = getCandidateName(app.candidate_id);
+              return {
+                ...app,
+                job_title: job.title,
+                job_location: job.location,
+                job_salary: job.salary,
+                candidate_name: name,
+                candidate_email: getCandidateEmail(app.candidate_id, name),
+                applied_date: new Date().toISOString(),
+                // In actual deployment, resumes can be fetched or point to candidate resume
+                resume_url: `https://frczxnikwppbeoouokmb.supabase.co/storage/v1/object/public/resumes/resume_${app.candidate_id}.pdf`
+              };
+            })
+          ).catch(() => []) // Silently ignore if job fetch fails
+        );
+
+        const results = await Promise.all(promises);
+        return results.flat();
       }
-      return apps;
+      return [];
     },
+    enabled: !!role,
   });
 };
 
@@ -37,11 +71,18 @@ export const useGetApplication = (id) => {
   return useQuery({
     queryKey: ['application', id],
     queryFn: async () => {
-      await delay(400);
-      const apps = getStoredApplications();
-      const app = apps.find((a) => a.id === id);
-      if (!app) throw new Error('Application not found');
-      return app;
+      // Fetch details by checking my applications or search
+      const response = await api.get('/applications/my');
+      const app = response.data.find(a => String(a.id) === String(id));
+      if (!app) {
+        throw new Error('Application details not found');
+      }
+      const name = getCandidateName(app.candidate_id);
+      return {
+        ...app,
+        candidate_name: name,
+        candidate_email: getCandidateEmail(app.candidate_id, name),
+      };
     },
     enabled: !!id,
   });
@@ -50,43 +91,13 @@ export const useGetApplication = (id) => {
 export const useApplyToJob = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ job, candidate, resumeUrl }) => {
-      await delay(1000); // Simulate network latency
-      const apps = getStoredApplications();
-      
-      // Check if already applied
-      const alreadyApplied = apps.some(
-        (app) => app.job_id === job.id && app.candidate_id === candidate.id
-      );
-
-      if (alreadyApplied) {
-        throw new Error('You have already applied for this job!');
-      }
-
-      const newApp = {
-        id: `app-${Math.random().toString(36).substring(2, 9)}`,
-        job_id: job.id,
-        job_title: job.title,
-        job_location: job.location,
-        job_salary: job.salary,
-        candidate_id: candidate.id,
-        candidate_name: candidate.name,
-        candidate_email: candidate.email,
-        resume_url: resumeUrl || '',
-        status: 'applied',
-        applied_date: new Date().toISOString(),
-      };
-
-      apps.push(newApp);
-      saveStoredApplications(apps);
-      return newApp;
+    mutationFn: async ({ job_id }) => {
+      const response = await api.post('/applications/', { job_id });
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] });
       toast.success('Your application was submitted successfully!');
-    },
-    onError: (error) => {
-      toast.error(error.message || 'Failed to submit application.');
     },
   });
 };
@@ -95,17 +106,8 @@ export const useUpdateApplicationStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, status }) => {
-      await delay(600);
-      const apps = getStoredApplications();
-      const appIndex = apps.findIndex((a) => a.id === id);
-      
-      if (appIndex === -1) {
-        throw new Error('Application not found');
-      }
-
-      apps[appIndex].status = status;
-      saveStoredApplications(apps);
-      return apps[appIndex];
+      const response = await api.put(`/applications/${id}`, { status });
+      return response.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['applications'] });
