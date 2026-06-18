@@ -30,7 +30,8 @@ api.interceptors.response.use(
         break;
       case 401:
         if (!isMeRequest) {
-          toast.error(errorMessage || 'Unauthorized. Please log in.');
+          toast.error(errorMessage || 'Session expired. Please log in.');
+          window.dispatchEvent(new Event('api-unauthorized'));
         }
         break;
       case 403:
