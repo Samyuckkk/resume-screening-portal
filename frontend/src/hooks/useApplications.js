@@ -91,8 +91,9 @@ export const useGetApplication = (id) => {
 export const useApplyToJob = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ job_id }) => {
-      const response = await api.post('/applications/', { job_id });
+    mutationFn: async (payload) => {
+      const jobId = payload?.job_id || payload?.job?.id || payload;
+      const response = await api.post('/applications/', { job_id: Number(jobId) });
       return response.data;
     },
     onSuccess: () => {
