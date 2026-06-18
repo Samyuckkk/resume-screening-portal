@@ -32,6 +32,8 @@ JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
 )
+COOKIE_SECURE = os.getenv("COOKIE_SECURE", "False").lower() == "true"
+COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "lax").lower()
 
 router = APIRouter()
 
@@ -264,8 +266,8 @@ def login(
         key="access_token",
         value=token,
         httponly=True,
-        secure=False,  # True in production HTTPS
-        samesite="lax",
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
@@ -282,7 +284,11 @@ def login(
 @router.post("/logout")
 def logout(response: Response):
 
-    response.delete_cookie("access_token")
+    response.delete_cookie(
+        key="access_token",
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
+    )
 
     return {
         "message": "Logged out successfully"
