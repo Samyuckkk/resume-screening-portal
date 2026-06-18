@@ -4,11 +4,12 @@ import { toast } from '../utils/toast';
 
 // Seed-based name generator to construct realistic candidate profiles from their candidate_id
 export const getCandidateName = (id) => {
-  const firstNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles"];
-  const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Davis", "Rodriguez", "Martinez", "Taylor"];
+  const firstNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles", "Emma", "Olivia", "Sophia", "Isabella", "Mia", "Alexander", "Daniel", "Matthew", "Lucas", "Emily"];
+  const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Davis", "Rodriguez", "Martinez", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson"];
   
-  const fIdx = Number(id) % firstNames.length;
-  const lIdx = (Number(id) * 3) % lastNames.length;
+  const seed = Number(id) || 1;
+  const fIdx = (seed * 17 + 3) % firstNames.length;
+  const lIdx = (seed * 31 + 7) % lastNames.length;
   return `${firstNames[fIdx]} ${lastNames[lIdx]}`;
 };
 
@@ -22,12 +23,25 @@ export const useGetApplications = (role, userId) => {
     queryFn: async () => {
       if (role === 'applicant') {
         const response = await api.get('/applications/my');
-        return response.data.map(app => ({
-          ...app,
-          candidate_name: getCandidateName(app.candidate_id),
-          candidate_email: getCandidateEmail(app.candidate_id, getCandidateName(app.candidate_id)),
-          applied_date: new Date().toISOString(), // Fallback applied date
-        }));
+        const apps = response.data;
+
+        // Fetch all jobs to associate metadata (title, location, salary)
+        const jobsRes = await api.get('/jobs/');
+        const jobsList = jobsRes.data;
+
+        return apps.map(app => {
+          const job = jobsList.find(j => j.id === app.job_id);
+          const name = getCandidateName(app.candidate_id);
+          return {
+            ...app,
+            job_title: job ? job.title : `Job #${app.job_id}`,
+            job_location: job ? job.location : 'N/A',
+            job_salary: job ? job.salary : 'N/A',
+            candidate_name: name,
+            candidate_email: getCandidateEmail(app.candidate_id, name),
+            applied_date: new Date().toISOString(), // Fallback applied date
+          };
+        });
       } else if (role === 'recruiter' || role === 'admin') {
         // Fetch all jobs
         const jobsRes = await api.get('/jobs/');
