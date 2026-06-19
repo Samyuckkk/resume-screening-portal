@@ -21,6 +21,8 @@ class ApplicationResponse(BaseModel):
     candidate_id: int
     job_id: int
     status: str
+    candidate_name: str | None = None
+    candidate_email: str | None = None
 
     class Config:
         from_attributes = True

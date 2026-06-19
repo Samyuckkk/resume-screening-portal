@@ -48,9 +48,17 @@ def create_interview(
 def get_interviews(
     db: Session = Depends(get_db),
     current_user: User = Depends(
-        require_roles("recruiter", "admin")
+        require_roles("recruiter", "admin", "applicant")
     )
 ):
+    if current_user.role == "applicant":
+        from app.models.application import Application
+        return (
+            db.query(Interview)
+            .join(Application, Interview.application_id == Application.id)
+            .filter(Application.candidate_id == current_user.id)
+            .all()
+        )
     return db.query(Interview).all()
 
 
@@ -72,6 +80,15 @@ def get_interview(
             status_code=404,
             detail="Interview not found"
         )
+
+    if current_user.role == "applicant":
+        from app.models.application import Application
+        app = db.query(Application).filter(Application.id == interview.application_id).first()
+        if not app or app.candidate_id != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to view this interview"
+            )
 
     return interview
 

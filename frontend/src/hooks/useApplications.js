@@ -31,14 +31,14 @@ export const useGetApplications = (role, userId) => {
 
         return apps.map(app => {
           const job = jobsList.find(j => j.id === app.job_id);
-          const name = getCandidateName(app.candidate_id);
+          const name = app.candidate_name || getCandidateName(app.candidate_id);
           return {
             ...app,
             job_title: job ? job.title : `Job #${app.job_id}`,
             job_location: job ? job.location : 'N/A',
             job_salary: job ? job.salary : 'N/A',
             candidate_name: name,
-            candidate_email: getCandidateEmail(app.candidate_id, name),
+            candidate_email: app.candidate_email || getCandidateEmail(app.candidate_id, name),
             applied_date: new Date().toISOString(), // Fallback applied date
           };
         });
@@ -56,14 +56,14 @@ export const useGetApplications = (role, userId) => {
         const promises = targetJobs.map(job => 
           api.get(`/applications/job/${job.id}`).then(res => 
             res.data.map(app => {
-              const name = getCandidateName(app.candidate_id);
+              const name = app.candidate_name || getCandidateName(app.candidate_id);
               return {
                 ...app,
                 job_title: job.title,
                 job_location: job.location,
                 job_salary: job.salary,
                 candidate_name: name,
-                candidate_email: getCandidateEmail(app.candidate_id, name),
+                candidate_email: app.candidate_email || getCandidateEmail(app.candidate_id, name),
                 applied_date: new Date().toISOString(),
                 // In actual deployment, resumes can be fetched or point to candidate resume
                 resume_url: `https://frczxnikwppbeoouokmb.supabase.co/storage/v1/object/public/resumes/resume_${app.candidate_id}.pdf`
@@ -91,11 +91,11 @@ export const useGetApplication = (id) => {
       if (!app) {
         throw new Error('Application details not found');
       }
-      const name = getCandidateName(app.candidate_id);
+      const name = app.candidate_name || getCandidateName(app.candidate_id);
       return {
         ...app,
         candidate_name: name,
-        candidate_email: getCandidateEmail(app.candidate_id, name),
+        candidate_email: app.candidate_email || getCandidateEmail(app.candidate_id, name),
       };
     },
     enabled: !!id,

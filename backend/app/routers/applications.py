@@ -70,7 +70,14 @@ def apply_for_job(
     db.commit()
     db.refresh(new_application)
 
-    return new_application
+    return ApplicationResponse(
+        id=new_application.id,
+        candidate_id=new_application.candidate_id,
+        job_id=new_application.job_id,
+        status=new_application.status,
+        candidate_name=user.name,
+        candidate_email=user.email
+    )
 
 
 @router.get("/my", response_model=list[ApplicationResponse])
@@ -98,7 +105,17 @@ def get_my_applications(
         Application.candidate_id == user.id
     ).all()
 
-    return applications
+    return [
+        ApplicationResponse(
+            id=app.id,
+            candidate_id=app.candidate_id,
+            job_id=app.job_id,
+            status=app.status,
+            candidate_name=user.name,
+            candidate_email=user.email
+        )
+        for app in applications
+    ]
 
 
 @router.get("/job/{job_id}", response_model=list[ApplicationResponse])
@@ -133,11 +150,23 @@ def get_applicants_for_job(
             detail="Job not found"
         )
 
-    applications = db.query(Application).filter(
+    results = db.query(Application, User).join(
+        User, Application.candidate_id == User.id
+    ).filter(
         Application.job_id == job_id
     ).all()
 
-    return applications
+    return [
+        ApplicationResponse(
+            id=app.id,
+            candidate_id=app.candidate_id,
+            job_id=app.job_id,
+            status=app.status,
+            candidate_name=u.name,
+            candidate_email=u.email
+        )
+        for app, u in results
+    ]
 
 
 @router.put("/{application_id}", response_model=ApplicationResponse)
@@ -178,4 +207,13 @@ def update_application_status(
     db.commit()
     db.refresh(application)
 
-    return application
+    candidate = db.query(User).filter(User.id == application.candidate_id).first()
+
+    return ApplicationResponse(
+        id=application.id,
+        candidate_id=application.candidate_id,
+        job_id=application.job_id,
+        status=application.status,
+        candidate_name=candidate.name if candidate else None,
+        candidate_email=candidate.email if candidate else None
+    )
