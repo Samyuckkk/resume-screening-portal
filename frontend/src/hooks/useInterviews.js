@@ -16,9 +16,6 @@ export const useGetInterviews = (role) => {
   return useQuery({
     queryKey: ['interviews', role],
     queryFn: async () => {
-      if (role === 'applicant') {
-        return getLocalInterviews();
-      }
       const response = await api.get('/interviews/');
       return response.data;
     },
