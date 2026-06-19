@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, Lock, Mail, User, UserPlus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { Mail, Lock, User, UserPlus, ArrowRight, UserCheck } from 'lucide-react';
 import { toast } from '../../utils/toast';
 
 const Register = () => {
@@ -10,7 +10,7 @@ const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('applicant'); // Default role
+  const [role, setRole] = useState('applicant');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -35,132 +35,94 @@ const Register = () => {
       };
       navigate(roleRedirects[loggedUser.role] || '/jobs', { replace: true });
     } catch (err) {
-      // Axios global interceptors handle showing the specific details
+      // handled globally
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const roles = [
-    { value: 'applicant', label: 'Applicant', desc: 'Find your dream job' },
-    { value: 'recruiter', label: 'Recruiter', desc: 'Hire top talent' },
-    { value: 'admin', label: 'Admin', desc: 'Manage portal assets' },
+    { value: 'applicant', label: 'Applicant', desc: 'Build a standout career profile' },
+    { value: 'recruiter', label: 'Recruiter', desc: 'Guide talent through the funnel' },
+    { value: 'admin', label: 'Admin', desc: 'Operate the platform experience' },
   ];
 
   return (
-    <div className="w-full p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl shadow-2xl flex flex-col gap-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 to-violet-600 items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-indigo-500/20 mb-2">
-          A
-        </div>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-850 dark:text-slate-100">Create Account</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Join us to streamline resume parsing and hiring.</p>
-      </div>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Full Name */}
-        <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Full Name</label>
-          <div className="relative">
-            <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
-            <input
-              type="text"
-              required
-              placeholder="John Doe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-slate-800 dark:text-slate-200"
-            />
+    <div className="glass-panel rounded-[2.5rem] p-8 shadow-2xl shadow-blue-100/70">
+      <div className="space-y-6">
+        <div className="space-y-3 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[1.5rem] bg-gradient-to-br from-blue-600 to-amber-400 text-white shadow-lg shadow-blue-200">
+            <UserPlus className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-slate-950">Create your account</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-500">Join the premium workspace for hiring, learning, and career progress.</p>
           </div>
         </div>
 
-        {/* Email */}
-        <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email Address</label>
-          <div className="relative">
-            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
-            <input
-              type="email"
-              required
-              placeholder="name@domain.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-slate-800 dark:text-slate-200"
-            />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Full name</label>
+            <div className="relative">
+              <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Alex Johnson" className="field pl-11" />
+            </div>
           </div>
-        </div>
 
-        {/* Password */}
-        <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Password</label>
-          <div className="relative">
-            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
-            <input
-              type="password"
-              required
-              placeholder="At least 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-slate-800 dark:text-slate-200"
-            />
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Email address</label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@domain.com" className="field pl-11" />
+            </div>
           </div>
-        </div>
 
-        {/* Role Selector Segmented Controls */}
-        <div className="space-y-2 pt-2">
-          <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Select Portal Role</label>
-          <div className="grid grid-cols-3 gap-2">
-            {roles.map((r) => (
-              <button
-                key={r.value}
-                type="button"
-                onClick={() => setRole(r.value)}
-                className={`p-3 rounded-xl border text-center flex flex-col items-center gap-1 transition-all ${
-                  role === r.value
-                    ? 'border-indigo-500 bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-semibold'
-                    : 'border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-650 dark:text-slate-400'
-                }`}
-              >
-                <span className="text-xs">{r.label}</span>
-              </button>
-            ))}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Password</label>
+            <div className="relative">
+              <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" className="field pl-11" />
+            </div>
           </div>
-        </div>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full flex items-center justify-center gap-2 py-3 bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/20 mt-6"
-        >
-          {isSubmitting ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          ) : (
-            <>
-              <UserPlus className="w-4 h-4" />
-              <span>Create Account</span>
-            </>
-          )}
-        </button>
-      </form>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Choose your portal role</label>
+            <div className="grid gap-3 md:grid-cols-3">
+              {roles.map((item) => (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => setRole(item.value)}
+                  className={`rounded-[1.5rem] border p-4 text-left ${
+                    role === item.value
+                      ? 'border-blue-200 bg-blue-50 shadow-md shadow-blue-100'
+                      : 'border-slate-200 bg-white/70 hover:border-slate-300 hover:bg-white'
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-slate-900">{item.label}</p>
+                  <p className="mt-1 text-xs leading-6 text-slate-500">{item.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {/* Footer */}
-      <div className="text-center pt-4 border-t border-slate-100 dark:border-slate-850">
-        <p className="text-sm text-slate-505 dark:text-slate-400">
+          <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
+            {isSubmitting ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <UserPlus className="h-4 w-4" />}
+            <span>{isSubmitting ? 'Creating account...' : 'Create account'}</span>
+          </button>
+        </form>
+
+        <div className="rounded-[1.5rem] bg-white/70 p-4 text-center text-sm text-slate-500">
           Already have an account?{' '}
-          <Link
-            to="/login"
-            className="font-bold text-indigo-500 hover:text-indigo-650 transition-colors inline-flex items-center gap-0.5"
-          >
-            <span>Login here</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+          <Link to="/login" className="inline-flex items-center gap-1 font-semibold text-blue-600 hover:text-blue-700">
+            Sign in
+            <ArrowRight className="h-4 w-4" />
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Register;
+

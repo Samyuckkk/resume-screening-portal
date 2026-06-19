@@ -1,65 +1,54 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import Sidebar from '../Navigation/Sidebar';
 import { Menu, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import Sidebar from '../Navigation/Sidebar';
 import { ToastContainer } from '../Common/Toast';
 
 const DashboardLayout = () => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-55 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
-      {/* Toast notifications */}
+    <div className="min-h-screen px-3 py-3 md:px-4 md:py-4">
       <ToastContainer />
 
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex">
-        <Sidebar />
-      </div>
-
-      {/* Mobile Sidebar Backdrop & Sidebar */}
-      {mobileSidebarOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs"
-            onClick={() => setMobileSidebarOpen(false)}
-          />
-          {/* Sidebar drawer */}
-          <div className="absolute top-0 left-0 w-64 h-full bg-white dark:bg-slate-900 shadow-2xl z-10">
-            <Sidebar />
-          </div>
+      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1600px] gap-4">
+        <div className="hidden md:block">
+          <Sidebar />
         </div>
-      )}
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile Header */}
-        <header className="flex md:hidden items-center justify-between px-4 py-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-850 z-30">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-              R
+        <AnimatePresence>
+          {mobileSidebarOpen && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 md:hidden">
+              <div className="absolute inset-0 bg-slate-900/25 backdrop-blur-sm" onClick={() => setMobileSidebarOpen(false)} />
+              <div className="absolute inset-y-3 left-3">
+                <Sidebar mobile onNavigate={() => setMobileSidebarOpen(false)} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-4">
+          <header className="surface-card sticky top-3 z-30 flex items-center justify-between rounded-[1.75rem] px-4 py-3 md:hidden">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Antigravity Careers</p>
+              <p className="text-xs text-slate-500">Modern screening experience</p>
             </div>
-            <span className="font-bold text-slate-800 dark:text-slate-100 text-sm tracking-tight">Resume Screening Portal</span>
-          </div>
+            <button type="button" onClick={() => setMobileSidebarOpen((value) => !value)} className="btn-ghost !rounded-xl !p-2.5">
+              {mobileSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </header>
 
-          <button
-            onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-500 dark:text-slate-400"
-          >
-            {mobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </header>
-
-        {/* Content Body */}
-        <main className="flex-1 overflow-y-auto px-4 py-6 md:p-8">
-          <div className="max-w-7xl mx-auto w-full">
-            <Outlet />
-          </div>
-        </main>
+          <main className="min-w-0 flex-1">
+            <div className="mx-auto w-full max-w-7xl space-y-6 pb-10">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );
 };
 
 export default DashboardLayout;
+

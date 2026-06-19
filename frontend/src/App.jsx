@@ -1,15 +1,12 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+﻿import React from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/Common/ProtectedRoute';
 import RoleRoute from './components/Common/RoleRoute';
-
-// Layouts
+import { Spinner } from './components/Common/Loaders';
 import DashboardLayout from './components/Layouts/DashboardLayout';
 import AuthLayout from './components/Layouts/AuthLayout';
-
-// Pages
 import JobList from './pages/Jobs/JobList';
 import JobDetails from './pages/Jobs/JobDetails';
 import Login from './pages/Auth/Login';
@@ -39,9 +36,9 @@ const RootRedirect = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950">
-        <div className="relative w-16 h-16">
-          <div className="absolute top-0 left-0 w-full h-full border-4 border-indigo-500 rounded-full border-t-transparent animate-spin"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="surface-card rounded-[2rem] p-8">
+          <Spinner size="lg" />
         </div>
       </div>
     );
@@ -65,20 +62,15 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Auth Layout for login/register */}
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
             </Route>
 
-            {/* Dashboard / Sidebar Layout */}
             <Route element={<DashboardLayout />}>
-              {/* Public Jobs Listings */}
               <Route path="/jobs" element={<JobList />} />
               <Route path="/jobs/:id" element={<JobDetails />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
-
-              {/* Shared Protected Settings */}
               <Route
                 path="/profile"
                 element={
@@ -87,8 +79,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-
-              {/* Candidate/Applicant dashboard */}
               <Route
                 path="/candidate"
                 element={
@@ -97,8 +87,6 @@ function App() {
                   </RoleRoute>
                 }
               />
-
-              {/* Recruiter / Admin dashboards */}
               <Route
                 path="/recruiter"
                 element={
@@ -131,8 +119,6 @@ function App() {
                   </RoleRoute>
                 }
               />
-
-              {/* Candidate Resume Inspection Details */}
               <Route
                 path="/resumes/candidate/:candidate_id"
                 element={
@@ -141,8 +127,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-
-              {/* System Admin Dashboard */}
               <Route
                 path="/admin"
                 element={
@@ -159,8 +143,6 @@ function App() {
                   </RoleRoute>
                 }
               />
-
-              {/* Landing page redirects to Login/Dashboard depending on auth status */}
               <Route path="/" element={<RootRedirect />} />
               <Route path="*" element={<NotFound />} />
             </Route>
@@ -172,3 +154,4 @@ function App() {
 }
 
 export default App;
+

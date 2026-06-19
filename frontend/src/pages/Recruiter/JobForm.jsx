@@ -1,26 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+﻿import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Briefcase, DollarSign, FileText, MapPin, Save } from 'lucide-react';
 import { useCreateJob, useUpdateJob, useGetJob } from '../../hooks/useJobs';
-import { ArrowLeft, Save, Briefcase, MapPin, DollarSign, FileText } from 'lucide-react';
+import { PageHeader, SectionCard } from '../../components/Common/ui';
 import { toast } from '../../utils/toast';
 
 const JobForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditMode = !!id;
-
-  // Mutations/Queries
   const createJobMutation = useCreateJob();
   const updateJobMutation = useUpdateJob();
   const { data: job, isLoading: isJobLoading } = useGetJob(id);
 
-  // Form State
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [salary, setSalary] = useState('');
 
-  // Populate data in edit mode
   useEffect(() => {
     if (isEditMode && job) {
       setTitle(job.title);
@@ -38,7 +35,6 @@ const JobForm = () => {
     }
 
     const jobData = { title, description, location, salary };
-
     try {
       if (isEditMode) {
         await updateJobMutation.mutateAsync({ id, jobData });
@@ -47,136 +43,52 @@ const JobForm = () => {
       }
       navigate('/recruiter');
     } catch (err) {
-      // Handled globally
+      // handled globally
     }
   };
 
   if (isEditMode && isJobLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+    return <div className="surface-card flex justify-center rounded-[2rem] p-10"><div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" /></div>;
   }
 
+  const isPending = createJobMutation.isPending || updateJobMutation.isPending;
+
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
-      {/* Back button */}
-      <div>
-        <Link
-          to="/recruiter"
-          className="inline-flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-350 transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Dashboard</span>
-        </Link>
-      </div>
-
-      {/* Form Card */}
-      <div className="p-6 md:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-6">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-905 dark:text-slate-100">
-            {isEditMode ? 'Edit Job Posting' : 'Post a New Job Position'}
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Provide details about the open position to start matching with candidate applications.
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Job Title</label>
-            <div className="relative">
-              <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                required
-                placeholder="Senior Full Stack Engineer"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-205 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-950/20 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-slate-805 dark:text-slate-200 outline-none"
-              />
+    <div className="mx-auto max-w-4xl space-y-6">
+      <Link to="/recruiter" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800"><ArrowLeft className="h-4 w-4" />Back to dashboard</Link>
+      <PageHeader eyebrow="Role editor" title={isEditMode ? 'Refine an existing role' : 'Publish a new role'} description="Craft a premium job post with the same underlying create and update behavior already wired into the app." />
+      <SectionCard>
+        <form onSubmit={handleSubmit} className="grid gap-5">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Job title</label>
+            <div className="relative"><Briefcase className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={title} onChange={(e) => setTitle(e.target.value)} className="field pl-11" placeholder="Senior Full Stack Engineer" required /></div>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Location</label>
+              <div className="relative"><MapPin className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={location} onChange={(e) => setLocation(e.target.value)} className="field pl-11" placeholder="Remote or hybrid" required /></div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Salary range</label>
+              <div className="relative"><DollarSign className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={salary} onChange={(e) => setSalary(e.target.value)} className="field pl-11" placeholder="$120k - $150k" /></div>
             </div>
           </div>
-
-          {/* Location & Salary */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Location */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Location</label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  required
-                  placeholder="New York, NY (Hybrid) or Remote"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-205 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-950/20 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-slate-855 dark:text-slate-200 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Salary */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Salary Range</label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="e.g. $120k - $150k"
-                  value={salary}
-                  onChange={(e) => setSalary(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-205 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-950/20 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-slate-855 dark:text-slate-200 outline-none"
-                />
-              </div>
-            </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Job description</label>
+            <div className="relative"><FileText className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-slate-400" /><textarea value={description} onChange={(e) => setDescription(e.target.value)} className="textarea-field min-h-56 pl-11" placeholder="Describe responsibilities, expectations, and outcomes..." required /></div>
           </div>
-
-          {/* Description */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
-              <FileText className="w-4 h-4 text-slate-400" />
-              <span>Job Description</span>
-            </label>
-            <textarea
-              required
-              rows={8}
-              placeholder="Detail job tasks, candidate requirements, benefits, and tech stack details..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-4 rounded-xl border border-slate-205 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-950/20 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-slate-855 dark:text-slate-200 outline-none"
-            />
-          </div>
-
-          {/* Buttons */}
-          <div className="pt-4 flex justify-end gap-3">
-            <Link
-              to="/recruiter"
-              className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350 text-sm font-semibold transition-colors"
-            >
-              Cancel
-            </Link>
-            <button
-              type="submit"
-              disabled={createJobMutation.isPending || updateJobMutation.isPending}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-400 text-white font-bold rounded-xl text-sm transition-all shadow-md focus:outline-none"
-            >
-              {createJobMutation.isPending || updateJobMutation.isPending ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  <span>{isEditMode ? 'Update Posting' : 'Publish Job'}</span>
-                </>
-              )}
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <Link to="/recruiter" className="btn-secondary">Cancel</Link>
+            <button type="submit" disabled={isPending} className="btn-primary">
+              {isPending ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <Save className="h-4 w-4" />}
+              <span>{isPending ? 'Saving...' : isEditMode ? 'Update role' : 'Publish role'}</span>
             </button>
           </div>
         </form>
-      </div>
+      </SectionCard>
     </div>
   );
 };
 
 export default JobForm;
+

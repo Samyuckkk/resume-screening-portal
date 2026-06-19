@@ -1,112 +1,111 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
-  LayoutDashboard,
   Briefcase,
-  User,
-  PlusSquare,
-  FileText,
-  Moon,
-  Sun,
-  LogOut,
-  Users,
-  Shield,
+  ChevronLeft,
+  ChevronRight,
   FileSearch,
+  GraduationCap,
+  LayoutDashboard,
+  LogOut,
+  Sparkles,
+  User,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-const Sidebar = () => {
+const Sidebar = ({ mobile = false, onNavigate }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem('theme') === 'dark' ||
-    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
-  );
-
-  useEffect(() => {
-    const root = window.document.body;
-    if (darkMode) {
-      root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [darkMode]);
+  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
+    onNavigate?.();
   };
 
   const getLinks = () => {
     switch (user?.role) {
       case 'applicant':
         return [
-          { to: '/candidate', label: 'My Dashboard', icon: LayoutDashboard },
-          { to: '/jobs', label: 'Explore Jobs', icon: Briefcase },
+          { to: '/candidate', label: 'Learning Hub', icon: LayoutDashboard },
+          { to: '/jobs', label: 'Career Paths', icon: Briefcase },
           { to: '/profile', label: 'My Profile', icon: User },
         ];
       case 'recruiter':
         return [
-          { to: '/recruiter', label: 'Recruiter Dashboard', icon: LayoutDashboard },
-          { to: '/jobs', label: 'Job Listings', icon: Briefcase },
-          { to: '/recruiter/jobs/create', label: 'Post a Job', icon: PlusSquare },
-          { to: '/profile', label: 'Profile Settings', icon: User },
+          { to: '/recruiter', label: 'Talent Studio', icon: LayoutDashboard },
+          { to: '/jobs', label: 'Published Roles', icon: Briefcase },
+          { to: '/recruiter/jobs/create', label: 'Create Role', icon: GraduationCap },
+          { to: '/profile', label: 'My Profile', icon: User },
         ];
       case 'admin':
         return [
-          { to: '/admin', label: 'Admin Dashboard', icon: LayoutDashboard },
-          { to: '/jobs', label: 'Job Board', icon: Briefcase },
-          { to: '/admin/parser', label: 'Resume Parser', icon: FileSearch },
-          { to: '/profile', label: 'Profile Settings', icon: User },
+          { to: '/admin', label: 'Command Center', icon: LayoutDashboard },
+          { to: '/jobs', label: 'Career Catalog', icon: Briefcase },
+          { to: '/admin/parser', label: 'Parser Studio', icon: FileSearch },
+          { to: '/profile', label: 'My Profile', icon: User },
         ];
       default:
-        return [
-          { to: '/jobs', label: 'Explore Jobs', icon: Briefcase },
-        ];
+        return [{ to: '/jobs', label: 'Career Paths', icon: Briefcase }];
     }
   };
 
   const links = getLinks();
-
   const roleLabels = {
-    applicant: 'Candidate',
-    recruiter: 'Recruiter',
-    admin: 'Administrator',
+    applicant: 'Learner',
+    recruiter: 'Mentor',
+    admin: 'Operator',
   };
 
   return (
-    <aside className="w-64 h-screen flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 backdrop-blur-md flex flex-col justify-between p-4 select-none z-20">
-      <div className="space-y-6">
-        {/* Brand */}
-        <div className="flex items-center gap-2 px-3 py-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-indigo-500/20">
-            R
+    <motion.aside
+      initial={mobile ? { x: -30, opacity: 0 } : false}
+      animate={mobile ? { x: 0, opacity: 1 } : false}
+      className={`${mobile ? 'w-[86vw] max-w-[320px]' : collapsed ? 'w-[96px]' : 'w-[290px]'} h-full rounded-[2rem] glass-panel flex flex-col justify-between p-4 md:p-5`}
+    >
+      <div className="space-y-5">
+        <div className="flex items-center justify-between gap-3 rounded-[1.5rem] bg-white/70 p-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-amber-300 text-white shadow-lg shadow-blue-200">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            {(!collapsed || mobile) && (
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-slate-900">Antigravity Careers</p>
+                <p className="text-xs text-slate-500">Premium learning to placement</p>
+              </div>
+            )}
           </div>
-          <div>
-            <h1 className="font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">Resume</h1>
-            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Screening Portal</span>
-          </div>
+          {!mobile && (
+            <button
+              type="button"
+              onClick={() => setCollapsed((value) => !value)}
+              className="btn-ghost !rounded-xl !p-2"
+            >
+              {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </button>
+          )}
         </div>
 
-        {/* User Card */}
         {user && (
-          <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{user.name}</p>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100/50 dark:border-indigo-850/50 capitalize">
-                {roleLabels[user.role] || user.role}
-              </span>
+          <div className="rounded-[1.75rem] bg-gradient-to-br from-slate-900 to-blue-950 p-4 text-white shadow-xl shadow-blue-100">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/14 text-lg font-bold uppercase">
+                {user.name?.charAt(0)}
+              </div>
+              {(!collapsed || mobile) && (
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{user.name}</p>
+                  <p className="text-xs text-blue-100/80">{roleLabels[user.role] || user.role}</p>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Navigation */}
-        <nav className="space-y-1">
+        <nav className="space-y-2">
           {links.map((link) => {
             const Icon = link.icon;
             return (
@@ -114,58 +113,41 @@ const Sidebar = () => {
                 key={link.to}
                 to={link.to}
                 end={link.to === '/candidate' || link.to === '/recruiter' || link.to === '/admin'}
+                onClick={() => onNavigate?.()}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                  `group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold ${
                     isActive
-                      ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/10'
-                      : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/40 dark:hover:text-slate-200'
+                      ? 'bg-white text-blue-700 shadow-lg shadow-blue-100'
+                      : 'text-slate-600 hover:bg-white/80 hover:text-slate-900'
                   }`
                 }
               >
-                <Icon className="w-4 h-4" />
-                {link.label}
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600">
+                  <Icon className="h-4 w-4" />
+                </span>
+                {(!collapsed || mobile) && <span className="truncate">{link.label}</span>}
               </NavLink>
             );
           })}
         </nav>
       </div>
 
-      <div className="space-y-2 pt-4 border-t border-slate-100 dark:border-slate-800/60">
-        {/* Theme Toggle */}
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/40 dark:hover:text-slate-200 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            {darkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-indigo-500" />}
-            <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
-          </div>
-          <span className="text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
-            {darkMode ? 'Dark' : 'Light'}
-          </span>
-        </button>
-
-        {/* Logout */}
+      <div className="space-y-3 rounded-[1.5rem] bg-white/70 p-3">
         {user ? (
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/20 transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
+          <button type="button" onClick={handleLogout} className="btn-danger w-full !justify-start">
+            <LogOut className="h-4 w-4" />
+            {(!collapsed || mobile) && <span>Sign Out</span>}
           </button>
         ) : (
-          <NavLink
-            to="/login"
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/20 transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Login</span>
+          <NavLink to="/login" onClick={() => onNavigate?.()} className="btn-primary w-full !justify-start">
+            <LogOut className="h-4 w-4" />
+            {(!collapsed || mobile) && <span>Sign In</span>}
           </NavLink>
         )}
       </div>
-    </aside>
+    </motion.aside>
   );
 };
 
 export default Sidebar;
+

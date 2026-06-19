@@ -1,78 +1,54 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+﻿import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Briefcase,
+  Calendar,
+  Edit2,
+  Eye,
+  MessageSquare,
+  Plus,
+  Trash2,
+  Users,
+  Video,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useGetJobs, useDeleteJob } from '../../hooks/useJobs';
 import { useGetApplications, useUpdateApplicationStatus } from '../../hooks/useApplications';
 import { useGetInterviews, useDeleteInterview, useUpdateFeedback } from '../../hooks/useInterviews';
-import { SkeletonTable } from '../../components/Common/Loaders';
 import EmptyState from '../../components/Common/EmptyState';
 import ConfirmDialog from '../../components/Common/ConfirmDialog';
-import {
-  Briefcase,
-  Users,
-  Calendar,
-  Plus,
-  Edit2,
-  Trash2,
-  ExternalLink,
-  MessageSquare,
-  ClipboardList,
-  Eye,
-  CheckCircle,
-  Video,
-} from 'lucide-react';
-import { toast } from '../../utils/toast';
+import { PageHeader, SectionCard, StatCard, TabButton } from '../../components/Common/ui';
 
 const RecruiterDashboard = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
-
-  // Queries
   const { data: jobs, isLoading: isJobsLoading } = useGetJobs();
   const { data: applications, isLoading: isAppsLoading } = useGetApplications('recruiter', user?.id);
   const { data: interviews, isLoading: isInterviewsLoading } = useGetInterviews(user?.role);
 
-  // Mutations
   const deleteJobMutation = useDeleteJob();
   const deleteInterviewMutation = useDeleteInterview();
   const updateStatusMutation = useUpdateApplicationStatus();
   const updateFeedbackMutation = useUpdateFeedback();
 
-  // Component States
   const [activeTab, setActiveTab] = useState('jobs');
-  
-  // Job Delete States
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [isJobDeleteOpen, setIsJobDeleteOpen] = useState(false);
-
-  // Interview Delete States
   const [selectedInterviewId, setSelectedInterviewId] = useState(null);
   const [isInterviewDeleteOpen, setIsInterviewDeleteOpen] = useState(false);
-
-  // Feedback states
   const [feedbackInterviewId, setFeedbackInterviewId] = useState(null);
   const [feedbackText, setFeedbackText] = useState('');
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
 
-  // Filter recruiter specific items (Admins see all)
   const myJobs = jobs?.filter((job) => user?.role === 'admin' || job.recruiter_id === user?.id) || [];
-  
-  // Filter candidate applications applying to my jobs
-  const myJobApplications = applications?.filter((app) => 
-    myJobs.some((job) => job.id === app.job_id)
-  ) || [];
-
-  // Filter interviews scheduled by me or for my jobs
-  const myInterviews = interviews?.filter((interview) => 
-    myJobApplications.some((app) => app.id === interview.application_id)
-  ) || [];
+  const myJobApplications = applications?.filter((app) => myJobs.some((job) => job.id === app.job_id)) || [];
+  const myInterviews = interviews?.filter((interview) => myJobApplications.some((app) => app.id === interview.application_id)) || [];
 
   const handleConfirmDeleteJob = async () => {
     if (!selectedJobId) return;
     try {
       await deleteJobMutation.mutateAsync(selectedJobId);
     } catch (err) {
-      // Handled globally
+      // handled globally
     } finally {
       setIsJobDeleteOpen(false);
       setSelectedJobId(null);
@@ -84,7 +60,7 @@ const RecruiterDashboard = () => {
     try {
       await deleteInterviewMutation.mutateAsync(selectedInterviewId);
     } catch (err) {
-      // Handled globally
+      // handled globally
     } finally {
       setIsInterviewDeleteOpen(false);
       setSelectedInterviewId(null);
@@ -94,8 +70,8 @@ const RecruiterDashboard = () => {
   const handleStatusChange = async (appId, newStatus) => {
     try {
       await updateStatusMutation.mutateAsync({ id: appId, status: newStatus });
-    } catch (e) {
-      // Handled globally
+    } catch (err) {
+      // handled globally
     }
   };
 
@@ -108,389 +84,202 @@ const RecruiterDashboard = () => {
   const handleSaveFeedback = async () => {
     if (!feedbackInterviewId) return;
     try {
-      await updateFeedbackMutation.mutateAsync({
-        id: feedbackInterviewId,
-        feedback: feedbackText,
-      });
+      await updateFeedbackMutation.mutateAsync({ id: feedbackInterviewId, feedback: feedbackText });
       setIsFeedbackModalOpen(false);
       setFeedbackInterviewId(null);
       setFeedbackText('');
     } catch (err) {
-      // Handled globally
+      // handled globally
     }
   };
 
-  // Status badge styling
   const statusColors = {
-    'Applied': 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border-blue-200/50',
-    'Shortlisted': 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200/50',
-    'Interview Scheduled': 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400 border-indigo-200/50',
-    'Selected': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200/50',
-    'Rejected': 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200/50',
+    Applied: 'bg-blue-50 text-blue-700',
+    Shortlisted: 'bg-amber-50 text-amber-700',
+    'Interview Scheduled': 'bg-violet-50 text-violet-700',
+    Selected: 'bg-emerald-50 text-emerald-700',
+    Rejected: 'bg-rose-50 text-rose-700',
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-500 to-violet-600 bg-clip-text text-transparent">
-            Recruiting Dashboard
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Manage job postings, parse applicant submissions, and schedule virtual evaluations.
-          </p>
-        </div>
+      <PageHeader
+        eyebrow="Recruiter studio"
+        title="Manage hiring like a premium cohort experience"
+        description="Publish roles, coach candidates through each stage, and keep interviews organized in a modern recruiting workspace."
+        action={<Link to="/recruiter/jobs/create" className="btn-primary"><Plus className="h-4 w-4" />Post a job</Link>}
+      />
 
-        <Link
-          to="/recruiter/jobs/create"
-          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-indigo-500/15"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Post a Job</span>
-        </Link>
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard icon={Briefcase} label="Open roles" value={myJobs.length} />
+        <StatCard icon={Users} label="Applicants" value={myJobApplications.length} tone="violet" />
+        <StatCard icon={Calendar} label="Interviews" value={myInterviews.length} tone="amber" />
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 select-none">
-        <button
-          onClick={() => setActiveTab('jobs')}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-semibold text-sm transition-colors ${
-            activeTab === 'jobs'
-              ? 'border-indigo-500 text-indigo-650 dark:text-indigo-400'
-              : 'border-transparent text-slate-550 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-205'
-          }`}
-        >
-          <Briefcase className="w-4.5 h-4.5" />
-          <span>Jobs Posted ({myJobs.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('candidates')}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-semibold text-sm transition-colors ${
-            activeTab === 'candidates'
-              ? 'border-indigo-500 text-indigo-650 dark:text-indigo-400'
-              : 'border-transparent text-slate-550 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-205'
-          }`}
-        >
-          <Users className="w-4.5 h-4.5" />
-          <span>Candidate Tracking ({myJobApplications.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('interviews')}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-semibold text-sm transition-colors ${
-            activeTab === 'interviews'
-              ? 'border-indigo-500 text-indigo-650 dark:text-indigo-400'
-              : 'border-transparent text-slate-550 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-205'
-          }`}
-        >
-          <Calendar className="w-4.5 h-4.5" />
-          <span>Interviews Scheduled ({myInterviews.length})</span>
-        </button>
+      <div className="flex flex-wrap gap-3">
+        <TabButton active={activeTab === 'jobs'} icon={Briefcase} onClick={() => setActiveTab('jobs')}>Jobs</TabButton>
+        <TabButton active={activeTab === 'candidates'} icon={Users} onClick={() => setActiveTab('candidates')}>Candidates</TabButton>
+        <TabButton active={activeTab === 'interviews'} icon={Calendar} onClick={() => setActiveTab('interviews')}>Interviews</TabButton>
       </div>
 
-      {/* Tab Contents */}
-      <div>
-        {/* Jobs Tab */}
-        {activeTab === 'jobs' && (
-          <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Active Job Positions</h2>
-
-            {isJobsLoading ? (
-              <SkeletonTable cols={4} rows={4} />
-            ) : myJobs.length === 0 ? (
-              <EmptyState
-                title="No Jobs Posted Yet"
-                description="Create a listing to receive resume submissions and screen candidates."
-                icon={Briefcase}
-                action={
-                  <Link
-                    to="/recruiter/jobs/create"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-500/10"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Create First Job</span>
-                  </Link>
-                }
-              />
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-850 text-xs font-bold text-slate-400 uppercase">
-                      <th className="py-3 px-4">Title</th>
-                      <th className="py-3 px-4">Location</th>
-                      <th className="py-3 px-4">Salary</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50 dark:divide-slate-850 text-sm">
-                    {myJobs.map((job) => (
-                      <tr key={job.id} className="hover:bg-slate-55/40 dark:hover:bg-slate-900/40 transition-colors">
-                        <td className="py-4 px-4 font-bold text-slate-800 dark:text-slate-200">
-                          {job.title}
-                        </td>
-                        <td className="py-4 px-4 text-slate-500 dark:text-slate-400">{job.location}</td>
-                        <td className="py-4 px-4 text-slate-500 dark:text-slate-400">{job.salary || 'Competitive'}</td>
-                        <td className="py-4 px-4 text-right">
-                          <div className="inline-flex items-center gap-2">
-                            <Link
-                              to={`/recruiter/jobs/edit/${job.id}`}
-                              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-500 dark:text-slate-450 transition-colors"
-                              title="Edit Job"
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </Link>
-                            <button
-                              onClick={() => {
-                                setSelectedJobId(job.id);
-                                setIsJobDeleteOpen(true);
-                              }}
-                              className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/30 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-600 dark:text-rose-455 transition-colors"
-                              title="Delete Job"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+      {activeTab === 'jobs' && (
+        <SectionCard className="space-y-5">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Published roles</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-500">Review, edit, or remove any role without changing the underlying flow.</p>
           </div>
-        )}
 
-        {/* Candidates Tab */}
-        {activeTab === 'candidates' && (
-          <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Applicant Pipelines</h2>
+          {isJobsLoading ? (
+            <div className="space-y-3">
+              <div className="skeleton-shimmer h-28 rounded-[1.75rem]" />
+              <div className="skeleton-shimmer h-28 rounded-[1.75rem]" />
+            </div>
+          ) : myJobs.length === 0 ? (
+            <EmptyState title="No jobs posted yet" description="Create your first listing to start receiving applications." icon={Briefcase} action={<Link to="/recruiter/jobs/create" className="btn-primary"><Plus className="h-4 w-4" />Create first job</Link>} />
+          ) : (
+            <div className="grid gap-4">
+              {myJobs.map((job) => (
+                <div key={job.id} className="rounded-[1.75rem] border border-slate-200 bg-slate-50/80 p-5">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900">{job.title}</h3>
+                      <p className="mt-1 text-sm text-slate-500">{job.location}</p>
+                      <p className="mt-3 text-sm text-slate-600">{job.salary || 'Competitive'}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Link to={`/recruiter/jobs/edit/${job.id}`} className="btn-secondary"><Edit2 className="h-4 w-4" />Edit</Link>
+                      <button type="button" onClick={() => { setSelectedJobId(job.id); setIsJobDeleteOpen(true); }} className="btn-danger"><Trash2 className="h-4 w-4" />Delete</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+      )}
 
-            {isAppsLoading ? (
-              <SkeletonTable cols={5} rows={4} />
-            ) : myJobApplications.length === 0 ? (
-              <EmptyState
-                title="No Applicants Yet"
-                description="Applicants will appear here once they apply to your jobs. Make sure your listings are active!"
-                icon={Users}
-              />
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-850 text-xs font-bold text-slate-400 uppercase">
-                      <th className="py-3 px-4">Candidate</th>
-                      <th className="py-3 px-4">Job Applied</th>
-                      <th className="py-3 px-4">Date</th>
-                      <th className="py-3 px-4">Pipeline Status</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50 dark:divide-slate-850 text-sm">
-                    {myJobApplications.map((app) => (
-                      <tr key={app.id} className="hover:bg-slate-55/40 dark:hover:bg-slate-900/40 transition-colors">
-                        <td className="py-4 px-4 font-bold text-slate-800 dark:text-slate-200">
-                          {app.candidate_name}
-                          <span className="block text-xs font-medium text-slate-400 mt-0.5">{app.candidate_email}</span>
-                        </td>
-                        <td className="py-4 px-4 text-slate-700 dark:text-slate-300 font-semibold">{app.job_title}</td>
-                        <td className="py-4 px-4 text-slate-500 dark:text-slate-400">
-                          {new Date(app.applied_date).toLocaleDateString(undefined, {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                          })}
-                        </td>
-                        <td className="py-4 px-4">
-                          <select
-                            value={app.status}
-                            onChange={(e) => handleStatusChange(app.id, e.target.value)}
-                            className={`px-2 py-1 rounded-full text-xs font-bold border outline-none bg-white dark:bg-slate-900 cursor-pointer ${statusColors[app.status] || 'bg-slate-100 border-slate-200 text-slate-650'}`}
-                          >
-                            <option value="Applied">Applied</option>
-                            <option value="Shortlisted">Shortlisted</option>
-                            <option value="Interview Scheduled">Interview Scheduled</option>
-                            <option value="Selected">Selected</option>
-                            <option value="Rejected">Rejected</option>
-                          </select>
-                        </td>
-                        <td className="py-4 px-4 text-right">
-                          <div className="inline-flex items-center gap-2">
-                            {app.resume_url ? (
-                              <Link
-                                to={`/resumes/candidate/${app.candidate_id}`}
-                                className="p-1.5 rounded-lg border border-indigo-200 dark:border-indigo-900/30 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 transition-colors flex items-center gap-1 text-xs font-bold"
-                                title="View Candidate Profile & Resume"
-                              >
-                                <Eye className="w-3.5 h-3.5" />
-                                <span>Resume</span>
-                              </Link>
-                            ) : (
-                              <span className="text-xs text-slate-400 italic">No Resume</span>
-                            )}
-                            
-                            <Link
-                              to={`/recruiter/interviews/schedule?app_id=${app.id}`}
-                              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-55 dark:hover:bg-slate-850 text-slate-500 dark:text-slate-450 transition-colors flex items-center gap-1 text-xs font-bold"
-                              title="Schedule Interview"
-                            >
-                              <Calendar className="w-3.5 h-3.5" />
-                              <span>Schedule</span>
-                            </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+      {activeTab === 'candidates' && (
+        <SectionCard className="space-y-5">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Candidate pipeline</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-500">A responsive view of every applicant across your roles.</p>
           </div>
-        )}
 
-        {/* Interviews Tab */}
-        {activeTab === 'interviews' && (
-          <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Scheduled Technical Evaluations</h2>
+          {isAppsLoading ? (
+            <div className="space-y-3">
+              <div className="skeleton-shimmer h-32 rounded-[1.75rem]" />
+            </div>
+          ) : myJobApplications.length === 0 ? (
+            <EmptyState title="No applicants yet" description="Applications will appear here once candidates start applying." icon={Users} />
+          ) : (
+            <div className="grid gap-4">
+              {myJobApplications.map((app) => (
+                <div key={app.id} className="rounded-[1.75rem] border border-slate-200 bg-slate-50/80 p-5">
+                  <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                    <div className="space-y-3">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-900">{app.candidate_name}</h3>
+                        <p className="text-sm text-slate-500">{app.candidate_email}</p>
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Applied role</p>
+                          <p className="mt-2 text-sm font-semibold text-slate-800">{app.job_title}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Date</p>
+                          <p className="mt-2 text-sm font-semibold text-slate-800">{new Date(app.applied_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-3 xl:w-72">
+                      <select value={app.status} onChange={(e) => handleStatusChange(app.id, e.target.value)} className={`select-field ${statusColors[app.status] || 'bg-slate-100 text-slate-700'}`}>
+                        <option value="Applied">Applied</option>
+                        <option value="Shortlisted">Shortlisted</option>
+                        <option value="Interview Scheduled">Interview Scheduled</option>
+                        <option value="Selected">Selected</option>
+                        <option value="Rejected">Rejected</option>
+                      </select>
+                      <div className="flex flex-wrap gap-2">
+                        {app.resume_url ? (
+                          <Link to={`/resumes/candidate/${app.candidate_id}`} className="btn-secondary"><Eye className="h-4 w-4" />Resume</Link>
+                        ) : (
+                          <span className="soft-pill bg-slate-100 text-slate-600">No resume</span>
+                        )}
+                        <Link to={`/recruiter/interviews/schedule?app_id=${app.id}`} className="btn-primary"><Calendar className="h-4 w-4" />Schedule</Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+      )}
 
-            {isInterviewsLoading ? (
-              <SkeletonTable cols={5} rows={4} />
-            ) : myInterviews.length === 0 ? (
-              <EmptyState
-                title="No Interviews Set"
-                description="Interviews will show up here once scheduled for active candidates."
-                icon={Calendar}
-              />
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-850 text-xs font-bold text-slate-400 uppercase">
-                      <th className="py-3 px-4">Candidate</th>
-                      <th className="py-3 px-4">Job</th>
-                      <th className="py-3 px-4">Date & Time</th>
-                      <th className="py-3 px-4">Meeting URL</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50 dark:divide-slate-850 text-sm">
-                    {myInterviews.map((interview) => {
-                      const app = myJobApplications.find((a) => a.id === interview.application_id);
-                      return (
-                        <tr key={interview.id} className="hover:bg-slate-55/40 dark:hover:bg-slate-900/40 transition-colors">
-                          <td className="py-4 px-4 font-bold text-slate-800 dark:text-slate-200">
-                            {app?.candidate_name || 'Candidate'}
-                          </td>
-                          <td className="py-4 px-4 text-slate-700 dark:text-slate-300 font-semibold">{app?.job_title || 'N/A'}</td>
-                          <td className="py-4 px-4 text-slate-500 dark:text-slate-400">
-                            <span className="block font-medium">{interview.interview_date}</span>
-                            <span className="block text-xs mt-0.5">{interview.interview_time}</span>
-                          </td>
-                          <td className="py-4 px-4">
-                            {interview.meeting_link ? (
-                              <a
-                                href={interview.meeting_link}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 text-xs text-indigo-500 hover:text-indigo-600 font-bold"
-                              >
-                                <Video className="w-3.5 h-3.5" />
-                                <span>Join Link</span>
-                              </a>
-                            ) : (
-                              <span className="text-xs text-slate-400 italic">No link</span>
-                            )}
-                          </td>
-                          <td className="py-4 px-4 text-right">
-                            <div className="inline-flex items-center gap-2">
-                              <button
-                                onClick={() => handleOpenFeedback(interview)}
-                                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-500 dark:text-slate-400 transition-colors flex items-center gap-1 text-xs font-bold"
-                                title="Update Interview Feedback"
-                              >
-                                <MessageSquare className="w-3.5 h-3.5" />
-                                <span>Feedback</span>
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setSelectedInterviewId(interview.id);
-                                  setIsInterviewDeleteOpen(true);
-                                }}
-                                className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/30 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-600 dark:text-rose-455 transition-colors"
-                                title="Cancel/Delete Interview"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+      {activeTab === 'interviews' && (
+        <SectionCard className="space-y-5">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Scheduled interviews</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-500">Manage sessions, feedback, and meeting links in one place.</p>
           </div>
-        )}
-      </div>
 
-      {/* Feedback Update Modal */}
+          {isInterviewsLoading ? (
+            <div className="space-y-3">
+              <div className="skeleton-shimmer h-32 rounded-[1.75rem]" />
+            </div>
+          ) : myInterviews.length === 0 ? (
+            <EmptyState title="No interviews set" description="Interviews will appear here once they are scheduled." icon={Calendar} />
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {myInterviews.map((interview) => {
+                const app = myJobApplications.find((item) => item.id === interview.application_id);
+                return (
+                  <div key={interview.id} className="rounded-[1.75rem] border border-slate-200 bg-slate-50/80 p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-900">{app?.candidate_name || 'Candidate'}</h3>
+                        <p className="mt-1 text-sm text-slate-500">{app?.job_title || 'Role unavailable'}</p>
+                      </div>
+                      <span className="soft-pill bg-violet-50 text-violet-700">Scheduled</span>
+                    </div>
+                    <div className="mt-4 space-y-2 text-sm text-slate-600">
+                      <div>{interview.interview_date}</div>
+                      <div>{interview.interview_time}</div>
+                    </div>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {interview.meeting_link ? <a href={interview.meeting_link} target="_blank" rel="noreferrer" className="btn-secondary"><Video className="h-4 w-4" />Join link</a> : <span className="soft-pill bg-slate-100 text-slate-600">No link</span>}
+                      <button type="button" onClick={() => handleOpenFeedback(interview)} className="btn-primary"><MessageSquare className="h-4 w-4" />Feedback</button>
+                      <button type="button" onClick={() => { setSelectedInterviewId(interview.id); setIsInterviewDeleteOpen(true); }} className="btn-danger"><Trash2 className="h-4 w-4" />Delete</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </SectionCard>
+      )}
+
       {isFeedbackModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onClick={() => setIsFeedbackModalOpen(false)} />
-          <div className="relative w-full max-w-md p-6 rounded-2xl glass border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl z-10">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
-              <ClipboardList className="w-5 h-5 text-indigo-500" />
-              <span>Hiring Feedback</span>
-            </h3>
-            <p className="text-xs text-slate-400 mb-4">Provide details about technical aptitude, soft skills, or grading decision.</p>
-            <textarea
-              rows={4}
-              value={feedbackText}
-              onChange={(e) => setFeedbackText(e.target.value)}
-              placeholder="Candidate demonstrated strong knowledge of coding schemas..."
-              className="w-full p-3 text-sm rounded-xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-800 dark:text-slate-200 outline-none"
-            />
-            <div className="mt-4 flex justify-end gap-3">
-              <button
-                onClick={() => setIsFeedbackModalOpen(false)}
-                className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-650 dark:text-slate-400 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveFeedback}
-                className="px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white transition-all shadow-md"
-              >
-                Save Feedback
-              </button>
+        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setIsFeedbackModalOpen(false)} />
+          <div className="surface-card relative z-10 w-full max-w-lg rounded-[2rem] p-6">
+            <h3 className="text-xl font-bold text-slate-900">Interview feedback</h3>
+            <p className="mt-2 text-sm leading-7 text-slate-500">Capture evaluation notes without altering the existing feedback flow.</p>
+            <textarea rows={5} value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} className="textarea-field mt-4" placeholder="Add notes about the session..." />
+            <div className="mt-5 flex justify-end gap-3">
+              <button type="button" onClick={() => setIsFeedbackModalOpen(false)} className="btn-secondary">Cancel</button>
+              <button type="button" onClick={handleSaveFeedback} className="btn-primary">Save feedback</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Confirmation Dialogs */}
-      <ConfirmDialog
-        isOpen={isJobDeleteOpen}
-        title="Delete Job Posting?"
-        message="Are you sure you want to delete this job listing? Any candidates in screening will no longer be visible."
-        confirmText="Delete Posting"
-        onConfirm={handleConfirmDeleteJob}
-        onCancel={() => setIsJobDeleteOpen(false)}
-        type="danger"
-      />
-
-      <ConfirmDialog
-        isOpen={isInterviewDeleteOpen}
-        title="Cancel Interview?"
-        message="Are you sure you want to cancel and delete this scheduled interview? This action is permanent."
-        confirmText="Cancel Interview"
-        onConfirm={handleConfirmDeleteInterview}
-        onCancel={() => setIsInterviewDeleteOpen(false)}
-        type="danger"
-      />
+      <ConfirmDialog isOpen={isJobDeleteOpen} title="Delete job posting?" message="Any related candidate activity will no longer be visible from this listing." confirmText="Delete posting" onConfirm={handleConfirmDeleteJob} onCancel={() => setIsJobDeleteOpen(false)} type="danger" />
+      <ConfirmDialog isOpen={isInterviewDeleteOpen} title="Delete interview?" message="This will permanently remove the scheduled session from the portal." confirmText="Delete interview" onConfirm={handleConfirmDeleteInterview} onCancel={() => setIsInterviewDeleteOpen(false)} type="danger" />
     </div>
   );
 };
 
 export default RecruiterDashboard;
+
