@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from '../../utils/toast';
-import { CheckCircle, AlertTriangle, XCircle, Info, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react';
 
 export const ToastContainer = () => {
   const [toasts, setToasts] = useState([]);
@@ -10,21 +10,18 @@ export const ToastContainer = () => {
     const unsubscribe = toast.subscribe((newToast) => {
       setToasts((prev) => [...prev, newToast]);
       setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== newToast.id));
+        setToasts((prev) => prev.filter((item) => item.id !== newToast.id));
       }, newToast.duration);
     });
+
     return unsubscribe;
   }, []);
 
-  const removeToast = (id) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
-
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4">
+    <div className="pointer-events-none fixed right-4 top-4 z-[80] flex w-full max-w-sm flex-col gap-3 px-2">
       <AnimatePresence>
-        {toasts.map((t) => (
-          <ToastItem key={t.id} toast={t} onClose={() => removeToast(t.id)} />
+        {toasts.map((item) => (
+          <ToastItem key={item.id} toast={item} onClose={() => setToasts((prev) => prev.filter((toastItem) => toastItem.id !== item.id))} />
         ))}
       </AnimatePresence>
     </div>
@@ -32,38 +29,45 @@ export const ToastContainer = () => {
 };
 
 const ToastItem = ({ toast, onClose }) => {
-  const icons = {
-    success: <CheckCircle className="w-5 h-5 text-emerald-500" />,
-    error: <XCircle className="w-5 h-5 text-rose-500" />,
-    warning: <AlertTriangle className="w-5 h-5 text-amber-500" />,
-    info: <Info className="w-5 h-5 text-blue-500" />,
+  const config = {
+    success: {
+      icon: <CheckCircle2 className="h-5 w-5 text-emerald-600" />,
+      accent: 'bg-emerald-50 border-emerald-100',
+    },
+    error: {
+      icon: <XCircle className="h-5 w-5 text-rose-600" />,
+      accent: 'bg-rose-50 border-rose-100',
+    },
+    warning: {
+      icon: <AlertTriangle className="h-5 w-5 text-amber-600" />,
+      accent: 'bg-amber-50 border-amber-100',
+    },
+    info: {
+      icon: <Info className="h-5 w-5 text-blue-600" />,
+      accent: 'bg-blue-50 border-blue-100',
+    },
   };
 
-  const borderColors = {
-    success: 'border-emerald-200/50 dark:border-emerald-800/30',
-    error: 'border-rose-200/50 dark:border-rose-800/30',
-    warning: 'border-amber-200/50 dark:border-amber-800/30',
-    info: 'border-blue-200/50 dark:border-blue-800/30',
-  };
+  const tone = config[toast.type] || config.info;
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: -20, scale: 0.95 }}
+      initial={{ opacity: 0, y: -18, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-      className={`pointer-events-auto flex items-start justify-between p-4 rounded-xl border glass shadow-xl ${borderColors[toast.type]}`}
+      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+      className={`pointer-events-auto rounded-[1.75rem] border p-4 shadow-xl backdrop-blur-xl ${tone.accent}`}
     >
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 mt-0.5">{icons[toast.type]}</div>
-        <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{toast.message}</p>
+        <div className="mt-0.5">{tone.icon}</div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-slate-800">{toast.message}</p>
+        </div>
+        <button type="button" onClick={onClose} className="rounded-full p-1 text-slate-400 hover:bg-white/70 hover:text-slate-600">
+          <X className="h-4 w-4" />
+        </button>
       </div>
-      <button
-        onClick={onClose}
-        className="flex-shrink-0 ml-4 p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-      >
-        <X className="w-4 h-4" />
-      </button>
     </motion.div>
   );
 };
+

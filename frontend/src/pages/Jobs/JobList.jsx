@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useGetJobs } from '../../hooks/useJobs';
-import { SkeletonCard } from '../../components/Common/Loaders';
-import EmptyState from '../../components/Common/EmptyState';
-import { Search, MapPin, DollarSign, Briefcase, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Briefcase, ChevronRight, DollarSign, MapPin, Search } from 'lucide-react';
+import EmptyState from '../../components/Common/EmptyState';
+import { SkeletonCard } from '../../components/Common/Loaders';
+import { PageHeader } from '../../components/Common/ui';
+import { useGetJobs } from '../../hooks/useJobs';
 
 const JobList = () => {
   const { data: jobs, isLoading, error } = useGetJobs();
@@ -15,121 +16,93 @@ const JobList = () => {
     const matchesSearch =
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesLocation =
-      !locationFilter || job.location.toLowerCase().includes(locationFilter.toLowerCase());
+    const matchesLocation = !locationFilter || job.location.toLowerCase().includes(locationFilter.toLowerCase());
     return matchesSearch && matchesLocation;
   });
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Available Careers
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Discover roles suited for your skills and career trajectory.
-          </p>
+      <PageHeader
+        eyebrow="Career marketplace"
+        title="Explore high-impact roles"
+        description="Browse premium job opportunities, discover the right fit, and move from learning to placement with a cleaner application experience."
+      />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="surface-card rounded-[2rem] p-4">
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Search roles</label>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Product design, data science, frontend..." className="field pl-11" />
+          </div>
+        </div>
+        <div className="surface-card rounded-[2rem] p-4">
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Preferred location</label>
+          <div className="relative">
+            <MapPin className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)} placeholder="Remote, Bangalore, New York..." className="field pl-11" />
+          </div>
         </div>
       </div>
 
-      {/* Search & Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 glass rounded-2xl border border-slate-200 dark:border-slate-800">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search by job title, description, keywords..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-slate-800 dark:text-slate-200"
-          />
-        </div>
-        <div className="relative">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Filter by location (e.g. Remote, New York)..."
-            value={locationFilter}
-            onChange={(e) => setLocationFilter(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-slate-800 dark:text-slate-200"
-          />
-        </div>
-      </div>
-
-      {/* Job Grid / List */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <SkeletonCard key={i} />
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <SkeletonCard key={index} />
           ))}
         </div>
       ) : error ? (
-        <div className="text-center py-12 p-6 glass rounded-2xl border border-rose-200 dark:border-rose-900/30">
-          <p className="text-rose-600 dark:text-rose-400 font-semibold">Error loading jobs. Please check the backend connection.</p>
-        </div>
+        <EmptyState title="Unable to load jobs" description="The catalog could not be loaded right now. Please verify the backend connection and try again." icon={Briefcase} />
       ) : filteredJobs?.length === 0 ? (
         <EmptyState
-          title="No Jobs Found"
-          description={
-            searchQuery || locationFilter
-              ? "We couldn't find any jobs matching your search parameters. Try adjusting your queries!"
-              : 'There are currently no job postings available. Check back soon!'
-          }
+          title="No matching roles found"
+          description={searchQuery || locationFilter ? 'Try broadening your search or removing the location filter to discover more roles.' : 'New opportunities will appear here once they are published.'}
           icon={Briefcase}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredJobs.map((job) => (
-            <motion.div
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {filteredJobs.map((job, index) => (
+            <motion.article
               key={job.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="flex flex-col justify-between p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
+              transition={{ delay: index * 0.04 }}
+              whileHover={{ y: -4 }}
+              className="surface-card flex h-full flex-col justify-between rounded-[2rem] p-6"
             >
-              {/* Top border decoration */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-              <div className="space-y-4">
-                <div className="flex justify-between items-start gap-2">
-                  <h3 className="font-bold text-slate-800 dark:text-slate-100 group-hover:text-indigo-650 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
-                    {job.title}
-                  </h3>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
-                    Full-time
-                  </span>
-                </div>
-
-                <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
-                  {job.description}
-                </p>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-850 flex flex-col gap-2">
-                <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{job.location}</span>
+              <div className="space-y-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Open role</p>
+                    <h3 className="mt-2 line-clamp-2 text-xl font-bold text-slate-900">{job.title}</h3>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <DollarSign className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{job.salary || 'Competitive'}</span>
+                  <span className="soft-pill bg-emerald-50 text-emerald-700">Active</span>
+                </div>
+                <p className="line-clamp-3 text-sm leading-7 text-slate-500">{job.description}</p>
+              </div>
+              <div className="mt-6 space-y-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <MapPin className="h-4 w-4 text-blue-500" />
+                      <span className="text-xs font-semibold uppercase tracking-[0.18em]">Location</span>
+                    </div>
+                    <p className="mt-2 text-sm font-semibold text-slate-800">{job.location}</p>
+                  </div>
+                  <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <DollarSign className="h-4 w-4 text-blue-500" />
+                      <span className="text-xs font-semibold uppercase tracking-[0.18em]">Compensation</span>
+                    </div>
+                    <p className="mt-2 text-sm font-semibold text-slate-800">{job.salary || 'Competitive'}</p>
                   </div>
                 </div>
-
-                <div className="mt-2 flex items-center justify-end">
-                  <Link
-                    to={`/jobs/${job.id}`}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-indigo-500 hover:text-indigo-600 transition-colors"
-                  >
-                    <span>View Details</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
+                <Link to={`/jobs/${job.id}`} className="btn-primary w-full">
+                  <span>View role details</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
               </div>
-            </motion.div>
+            </motion.article>
           ))}
         </div>
       )}
@@ -138,3 +111,4 @@ const JobList = () => {
 };
 
 export default JobList;
+
