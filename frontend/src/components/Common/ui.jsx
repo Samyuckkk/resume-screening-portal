@@ -2,24 +2,24 @@
 import { motion } from 'framer-motion';
 
 export const fadeUp = {
-  initial: { opacity: 0, y: 18 },
+  initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.35, ease: 'easeOut' },
+  transition: { duration: 0.25, ease: 'easeOut' },
 };
 
-export const PageHeader = ({ eyebrow, title, description, action, className = '' }) => (
+export const PageHeader = ({ eyebrow, title, description, action, className = '', variant = 'light' }) => (
   <motion.div
     initial={fadeUp.initial}
     animate={fadeUp.animate}
     transition={fadeUp.transition}
-    className={`hero-panel rounded-[2rem] p-6 md:p-8 ${className}`}
+    className={`${variant === 'hero' ? 'hero-panel rounded-lg p-6 md:p-8' : 'page-header-light'} ${className}`}
   >
-    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-      <div className="max-w-3xl space-y-4">
-        {eyebrow ? <div className="page-eyebrow">{eyebrow}</div> : null}
-        <div className="space-y-3">
-          <h1 className="page-title">{title}</h1>
-          {description ? <p className="page-copy">{description}</p> : null}
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="max-w-3xl space-y-2">
+        {eyebrow ? <div className={variant === 'hero' ? 'page-eyebrow' : 'text-xs font-semibold uppercase tracking-wide text-[#457eff]'}>{eyebrow}</div> : null}
+        <div className="space-y-2">
+          <h1 className={variant === 'hero' ? 'page-title' : 'text-2xl font-bold text-[#121224] md:text-3xl'}>{title}</h1>
+          {description ? <p className={variant === 'hero' ? 'page-copy' : 'text-sm leading-relaxed text-[#717b9e] md:text-base'}>{description}</p> : null}
         </div>
       </div>
       {action ? <div className="flex shrink-0 items-center">{action}</div> : null}
@@ -32,7 +32,7 @@ export const SectionCard = ({ children, className = '' }) => (
     initial={fadeUp.initial}
     animate={fadeUp.animate}
     transition={fadeUp.transition}
-    className={`surface-card rounded-[2rem] p-5 md:p-6 ${className}`}
+    className={`data-card ${className}`}
   >
     {children}
   </motion.div>
@@ -40,29 +40,24 @@ export const SectionCard = ({ children, className = '' }) => (
 
 export const StatCard = ({ icon: Icon, label, value, tone = 'blue', hint }) => {
   const tones = {
-    blue: 'bg-blue-50 text-blue-600 border-blue-100',
-    amber: 'bg-amber-50 text-amber-600 border-amber-100',
-    emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-    violet: 'bg-violet-50 text-violet-600 border-violet-100',
-    rose: 'bg-rose-50 text-rose-600 border-rose-100',
+    blue: 'bg-[#eef3ff] text-[#457eff]',
+    amber: 'bg-[#fff8e6] text-[#d97706]',
+    emerald: 'bg-[#edf7ed] text-[#47b749]',
+    violet: 'bg-[#f3f0ff] text-[#7c3aed]',
+    rose: 'bg-[#fdeaea] text-[#e03939]',
   };
 
   return (
-    <motion.div
-      initial={fadeUp.initial}
-      animate={fadeUp.animate}
-      transition={fadeUp.transition}
-      className="metric-card"
-    >
+    <motion.div initial={fadeUp.initial} animate={fadeUp.animate} transition={fadeUp.transition} className="metric-card">
       <div className="flex items-start justify-between gap-4">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">{label}</p>
-          <p className="text-3xl font-bold text-slate-900">{value}</p>
-          {hint ? <p className="text-sm text-slate-500">{hint}</p> : null}
+        <div className="space-y-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-[#717b9e]">{label}</p>
+          <p className="text-2xl font-bold text-[#121224]">{value}</p>
+          {hint ? <p className="text-sm text-[#717b9e]">{hint}</p> : null}
         </div>
         {Icon ? (
-          <div className={`rounded-2xl border p-3 ${tones[tone] || tones.blue}`}>
-            <Icon className="h-6 w-6" />
+          <div className={`rounded-lg p-2.5 ${tones[tone] || tones.blue}`}>
+            <Icon className="h-5 w-5" />
           </div>
         ) : null}
       </div>
@@ -71,20 +66,15 @@ export const StatCard = ({ icon: Icon, label, value, tone = 'blue', hint }) => {
 };
 
 export const TabButton = ({ active, icon: Icon, children, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`tab-chip ${active ? 'tab-chip-active' : ''}`}
-  >
+  <button type="button" onClick={onClick} className={`tab-chip ${active ? 'tab-chip-active' : ''}`}>
     {Icon ? <Icon className="h-4 w-4" /> : null}
     <span>{children}</span>
   </button>
 );
 
 export const InfoPair = ({ label, value, className = '' }) => (
-  <div className={`space-y-1 ${className}`}>
-    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">{label}</p>
-    <p className="text-sm font-semibold text-slate-800">{value}</p>
+  <div className={`space-y-0.5 ${className}`}>
+    <p className="text-xs font-medium text-[#717b9e]">{label}</p>
+    <p className="text-sm font-semibold text-[#121224]">{value}</p>
   </div>
 );
-

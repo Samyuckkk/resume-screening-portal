@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 app = FastAPI(
-    title="Resume Screening Portal"
+    title="Recruvo"
 )
 
 # Configure CORS Middleware

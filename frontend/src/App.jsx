@@ -53,7 +53,7 @@ const RootRedirect = () => {
     return <Navigate to={roleRedirects[user.role] || '/jobs'} replace />;
   }
 
-  return <Navigate to="/login" replace />;
+  return <Navigate to="/jobs" replace />;
 };
 
 function App() {

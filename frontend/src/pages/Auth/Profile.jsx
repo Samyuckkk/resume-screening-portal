@@ -64,28 +64,28 @@ const Profile = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 lg:px-6">
       <PageHeader
         eyebrow="Profile"
         title="Account settings"
-        description="Manage your identity, protect your account, and keep your portal access in sync with your role."
+        description="Manage your profile, update password, and account preferences."
       />
 
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <SectionCard className="space-y-6">
-          <div className="rounded-[2rem] bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 p-6 text-white">
+          <div className="rounded-lg bg-gradient-to-r from-[#457eff] to-[#5b8fff] p-6 text-white">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-white/12 text-2xl font-bold uppercase">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-2xl font-bold uppercase">
                 {user?.name?.charAt(0)}
               </div>
               <div>
                 <p className="text-xl font-bold">{user?.name}</p>
-                <p className="mt-1 text-sm text-blue-100/80">{roleLabels[user?.role] || user?.role}</p>
+                <p className="mt-1 text-sm text-white/80">{roleLabels[user?.role] || user?.role}</p>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-5 rounded-[1.75rem] bg-slate-50/80 p-5">
+          <div className="grid gap-4 rounded-lg bg-[#f8f9fa] p-5">
             <div className="flex items-start gap-3">
               <User className="mt-1 h-5 w-5 text-blue-600" />
               <InfoPair label="Full name" value={user?.name} />
@@ -116,23 +116,23 @@ const Profile = () => {
             <form onSubmit={handleChangePassword} className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2 md:col-span-2">
                 <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Current password</label>
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input type="password" required value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="field pl-11" placeholder="Current password" />
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-slate-400 shrink-0" />
+                  <input type="password" required value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="field !px-3.5" placeholder="Current password" />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">New password</label>
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input type="password" required value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="field pl-11" placeholder="At least 6 characters" />
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-slate-400 shrink-0" />
+                  <input type="password" required value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="field !px-3.5" placeholder="At least 6 characters" />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Confirm password</label>
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="field pl-11" placeholder="Repeat new password" />
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-slate-400 shrink-0" />
+                  <input type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="field !px-3.5" placeholder="Repeat new password" />
                 </div>
               </div>
               <div className="md:col-span-2 flex justify-end">

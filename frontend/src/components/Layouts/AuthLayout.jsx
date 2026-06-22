@@ -1,5 +1,6 @@
 ﻿import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ToastContainer } from '../Common/Toast';
 
@@ -16,41 +17,53 @@ const AuthLayout = () => {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden px-4 py-10">
+    <div className="min-h-screen bg-[#f8f9fa]">
       <ToastContainer />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(96,165,250,0.28),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(251,191,36,0.18),_transparent_25%)]" />
-      <div className="relative mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl items-center justify-center">
-        <div className="grid w-full items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="hidden lg:block">
-            <div className="hero-panel rounded-[2.5rem] p-10">
-              <div className="page-eyebrow">Career acceleration platform</div>
-              <div className="mt-6 space-y-5">
-                <h1 className="text-5xl font-bold leading-tight text-slate-950">
-                  Learn faster, apply smarter, get hired with clarity.
-                </h1>
-                <p className="max-w-xl text-base leading-8 text-slate-600">
-                  A polished educational and career workspace for candidates, recruiters, and admins to move from resume to interview with confidence.
-                </p>
+
+      {/* Minimal header */}
+      <header className="border-b border-[#e8e8e8] bg-white">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 lg:px-6">
+          <Link to="/jobs" className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded bg-[#457eff] text-sm font-extrabold text-white">
+              R
+            </div>
+            <span className="text-lg font-bold text-[#121224]">
+              Recruvo
+            </span>
+          </Link>
+          <div className="flex items-center gap-4 text-sm">
+            <Link to="/jobs" className="text-[#474d6a] hover:text-[#457eff]">Browse Jobs</Link>
+          </div>
+        </div>
+      </header>
+
+      <div className="mx-auto grid min-h-[calc(100vh-56px)] max-w-6xl items-center gap-8 px-4 py-10 lg:grid-cols-2 lg:px-6">
+        <div className="hidden lg:block">
+          <div className="rounded-lg bg-gradient-to-br from-[#457eff] to-[#5b8fff] p-10 text-white">
+            <h1 className="text-3xl font-bold leading-tight">
+              Find your dream job now
+            </h1>
+            <p className="mt-4 text-base leading-relaxed text-white/85">
+              5 lakh+ jobs for you to explore. Create your profile, upload resume, and apply to top companies in one click.
+            </p>
+            <div className="mt-8 grid grid-cols-3 gap-4">
+              <div className="rounded-lg bg-white/15 p-4 backdrop-blur">
+                <p className="text-2xl font-bold">AI</p>
+                <p className="mt-1 text-xs text-white/80">Resume parsing</p>
               </div>
-              <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                <div className="rounded-[1.5rem] bg-white/80 p-4">
-                  <p className="text-2xl font-bold text-slate-900">100%</p>
-                  <p className="mt-1 text-sm text-slate-500">Existing flows preserved</p>
-                </div>
-                <div className="rounded-[1.5rem] bg-white/80 p-4">
-                  <p className="text-2xl font-bold text-slate-900">AI</p>
-                  <p className="mt-1 text-sm text-slate-500">Resume parsing at a glance</p>
-                </div>
-                <div className="rounded-[1.5rem] bg-white/80 p-4">
-                  <p className="text-2xl font-bold text-slate-900">Mobile</p>
-                  <p className="mt-1 text-sm text-slate-500">Responsive across every step</p>
-                </div>
+              <div className="rounded-lg bg-white/15 p-4 backdrop-blur">
+                <p className="text-2xl font-bold">1-Click</p>
+                <p className="mt-1 text-xs text-white/80">Apply to jobs</p>
+              </div>
+              <div className="rounded-lg bg-white/15 p-4 backdrop-blur">
+                <p className="text-2xl font-bold">Free</p>
+                <p className="mt-1 text-xs text-white/80">For job seekers</p>
               </div>
             </div>
           </div>
-          <div className="relative mx-auto w-full max-w-md">
-            <Outlet />
-          </div>
+        </div>
+        <div className="mx-auto w-full max-w-md">
+          <Outlet />
         </div>
       </div>
     </div>
@@ -58,4 +71,3 @@ const AuthLayout = () => {
 };
 
 export default AuthLayout;
-

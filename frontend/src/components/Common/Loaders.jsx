@@ -17,20 +17,16 @@ export const Spinner = ({ size = 'md', color = 'indigo' }) => {
 };
 
 export const SkeletonCard = () => (
-  <div className="surface-card space-y-4 rounded-[2rem] p-6">
+  <div className="data-card space-y-3">
     <div className="flex items-start justify-between gap-4">
-      <div className="skeleton-shimmer h-6 w-1/2 rounded-full" />
-      <div className="skeleton-shimmer h-8 w-20 rounded-full" />
+      <div className="skeleton-shimmer h-5 w-1/2 rounded" />
+      <div className="skeleton-shimmer h-6 w-16 rounded" />
     </div>
-    <div className="space-y-3">
-      <div className="skeleton-shimmer h-4 w-full rounded-full" />
-      <div className="skeleton-shimmer h-4 w-4/5 rounded-full" />
-      <div className="skeleton-shimmer h-4 w-3/5 rounded-full" />
+    <div className="space-y-2">
+      <div className="skeleton-shimmer h-3 w-full rounded" />
+      <div className="skeleton-shimmer h-3 w-4/5 rounded" />
     </div>
-    <div className="grid grid-cols-2 gap-3 pt-3">
-      <div className="skeleton-shimmer h-11 rounded-2xl" />
-      <div className="skeleton-shimmer h-11 rounded-2xl" />
-    </div>
+    <div className="skeleton-shimmer h-3 w-1/3 rounded" />
   </div>
 );
 

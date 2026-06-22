@@ -102,12 +102,12 @@ const RecruiterDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 lg:px-6">
       <PageHeader
-        eyebrow="Recruiter studio"
-        title="Manage hiring like a premium cohort experience"
-        description="Publish roles, coach candidates through each stage, and keep interviews organized in a modern recruiting workspace."
-        action={<Link to="/recruiter/jobs/create" className="btn-primary"><Plus className="h-4 w-4" />Post a job</Link>}
+        eyebrow="Recruiter"
+        title="Manage your hiring"
+        description="Post jobs, review candidates, schedule interviews, and track your hiring pipeline."
+        action={<Link to="/recruiter/jobs/create" className="btn-primary"><Plus className="h-4 w-4" />Post a Job</Link>}
       />
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -116,8 +116,8 @@ const RecruiterDashboard = () => {
         <StatCard icon={Calendar} label="Interviews" value={myInterviews.length} tone="amber" />
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <TabButton active={activeTab === 'jobs'} icon={Briefcase} onClick={() => setActiveTab('jobs')}>Jobs</TabButton>
+      <div className="flex flex-wrap gap-1 border-b border-[#e8e8e8]">
+        <TabButton active={activeTab === 'jobs'} icon={Briefcase} onClick={() => setActiveTab('jobs')}>My Jobs</TabButton>
         <TabButton active={activeTab === 'candidates'} icon={Users} onClick={() => setActiveTab('candidates')}>Candidates</TabButton>
         <TabButton active={activeTab === 'interviews'} icon={Calendar} onClick={() => setActiveTab('interviews')}>Interviews</TabButton>
       </div>

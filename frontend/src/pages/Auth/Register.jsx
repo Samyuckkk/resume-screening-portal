@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Lock, Mail, User, UserPlus } from 'lucide-react';
+import { Lock, Mail, User, UserPlus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from '../../utils/toast';
 
@@ -42,81 +42,100 @@ const Register = () => {
   };
 
   const roles = [
-    { value: 'applicant', label: 'Applicant', desc: 'Build a standout career profile' },
-    { value: 'recruiter', label: 'Recruiter', desc: 'Guide talent through the funnel' },
-    { value: 'admin', label: 'Admin', desc: 'Operate the platform experience' },
+    { value: 'applicant', label: 'Job Seeker', desc: 'Find and apply to jobs' },
+    { value: 'recruiter', label: 'Employer', desc: 'Post jobs & hire talent' },
+    { value: 'admin', label: 'Admin', desc: 'Manage the platform' },
   ];
 
   return (
-    <div className="glass-panel rounded-[2.5rem] p-8 shadow-2xl shadow-blue-100/70">
-      <div className="space-y-6">
-        <div className="space-y-3 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[1.5rem] bg-gradient-to-br from-blue-600 to-amber-400 text-white shadow-lg shadow-blue-200">
-            <UserPlus className="h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-slate-950">Create your account</h2>
-            <p className="mt-2 text-sm leading-7 text-slate-500">Join the premium workspace for hiring, learning, and career progress.</p>
-          </div>
+    <div className="data-card">
+      <div className="space-y-5">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-[#121224]">Create your account</h2>
+          <p className="mt-1 text-sm text-[#717b9e]">Register to apply to jobs or post openings</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Full name</label>
-            <div className="relative">
-              <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Alex Johnson" className="field pl-11" />
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-[#474d6a]">Full Name</label>
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-[#717b9e] shrink-0" />
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your full name"
+                className="field !px-3.5"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-[#474d6a]">Email ID</label>
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-[#717b9e] shrink-0" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="field !px-3.5"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-[#474d6a]">Password</label>
+            <div className="flex items-center gap-2">
+              <Lock className="h-4 w-4 text-[#717b9e] shrink-0" />
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Minimum 6 characters"
+                className="field !px-3.5"
+              />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Email address</label>
-            <div className="relative">
-              <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@domain.com" className="field pl-11" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Password</label>
-            <div className="relative">
-              <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" className="field pl-11" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Choose your portal role</label>
-            <div className="grid gap-3 md:grid-cols-3">
+            <label className="text-sm font-medium text-[#474d6a]">I am a</label>
+            <div className="grid gap-2">
               {roles.map((item) => (
                 <button
                   key={item.value}
                   type="button"
                   onClick={() => setRole(item.value)}
-                  className={`rounded-[1.5rem] border p-4 text-left ${
+                  className={`rounded border p-3 text-left ${
                     role === item.value
-                      ? 'border-blue-200 bg-blue-50 shadow-md shadow-blue-100'
-                      : 'border-slate-200 bg-white/70 hover:border-slate-300 hover:bg-white'
+                      ? 'border-[#457eff] bg-[#eef3ff]'
+                      : 'border-[#e8e8e8] bg-white hover:border-[#ccc]'
                   }`}
                 >
-                  <p className="text-sm font-semibold text-slate-900">{item.label}</p>
-                  <p className="mt-1 text-xs leading-6 text-slate-500">{item.desc}</p>
+                  <p className="text-sm font-semibold text-[#121224]">{item.label}</p>
+                  <p className="text-xs text-[#717b9e]">{item.desc}</p>
                 </button>
               ))}
             </div>
           </div>
 
-          <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
-            {isSubmitting ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <UserPlus className="h-4 w-4" />}
-            <span>{isSubmitting ? 'Creating account...' : 'Create account'}</span>
+          <button type="submit" disabled={isSubmitting} className="btn-orange w-full !py-3">
+            {isSubmitting ? (
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            ) : (
+              <UserPlus className="h-4 w-4" />
+            )}
+            <span>{isSubmitting ? 'Creating account...' : 'Register for free'}</span>
           </button>
         </form>
 
-        <div className="rounded-[1.5rem] bg-white/70 p-4 text-center text-sm text-slate-500">
-          Already have an account?{' '}
-          <Link to="/login" className="inline-flex items-center gap-1 font-semibold text-blue-600 hover:text-blue-700">
-            Sign in
-            <ArrowRight className="h-4 w-4" />
+        <div className="border-t border-[#e8e8e8] pt-4 text-center text-sm text-[#717b9e]">
+          Already registered?{' '}
+          <Link to="/login" className="font-semibold text-[#457eff] hover:underline">
+            Login
           </Link>
         </div>
       </div>
@@ -125,4 +144,3 @@ const Register = () => {
 };
 
 export default Register;
-

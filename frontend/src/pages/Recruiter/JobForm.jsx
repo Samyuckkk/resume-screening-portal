@@ -54,28 +54,40 @@ const JobForm = () => {
   const isPending = createJobMutation.isPending || updateJobMutation.isPending;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link to="/recruiter" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800"><ArrowLeft className="h-4 w-4" />Back to dashboard</Link>
-      <PageHeader eyebrow="Role editor" title={isEditMode ? 'Refine an existing role' : 'Publish a new role'} description="Craft a premium job post with the same underlying create and update behavior already wired into the app." />
+    <div className="mx-auto max-w-4xl space-y-6 px-4 py-6 lg:px-6">
+      <Link to="/recruiter" className="inline-flex items-center gap-2 text-sm text-[#717b9e] hover:text-[#457eff]"><ArrowLeft className="h-4 w-4" />Back to dashboard</Link>
+      <PageHeader eyebrow="Post a Job" title={isEditMode ? 'Edit job posting' : 'Post a new job'} description="Fill in the job details to attract the right candidates." />
       <SectionCard>
         <form onSubmit={handleSubmit} className="grid gap-5">
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Job title</label>
-            <div className="relative"><Briefcase className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={title} onChange={(e) => setTitle(e.target.value)} className="field pl-11" placeholder="Senior Full Stack Engineer" required /></div>
+            <div className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4 text-slate-400 shrink-0" />
+              <input value={title} onChange={(e) => setTitle(e.target.value)} className="field !px-3.5" placeholder="Senior Full Stack Engineer" required />
+            </div>
           </div>
           <div className="grid gap-5 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Location</label>
-              <div className="relative"><MapPin className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={location} onChange={(e) => setLocation(e.target.value)} className="field pl-11" placeholder="Remote or hybrid" required /></div>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
+                <input value={location} onChange={(e) => setLocation(e.target.value)} className="field !px-3.5" placeholder="Remote or hybrid" required />
+              </div>
             </div>
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Salary range</label>
-              <div className="relative"><DollarSign className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={salary} onChange={(e) => setSalary(e.target.value)} className="field pl-11" placeholder="$120k - $150k" /></div>
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-slate-400 shrink-0" />
+                <input value={salary} onChange={(e) => setSalary(e.target.value)} className="field !px-3.5" placeholder="$120k - $150k" />
+              </div>
             </div>
           </div>
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Job description</label>
-            <div className="relative"><FileText className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-slate-400" /><textarea value={description} onChange={(e) => setDescription(e.target.value)} className="textarea-field min-h-56 pl-11" placeholder="Describe responsibilities, expectations, and outcomes..." required /></div>
+            <div className="flex items-start gap-2">
+              <FileText className="h-4 w-4 text-slate-400 shrink-0 mt-2.5" />
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="textarea-field min-h-56 !px-3.5" placeholder="Describe responsibilities, expectations, and outcomes..." required />
+            </div>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <Link to="/recruiter" className="btn-secondary">Cancel</Link>
