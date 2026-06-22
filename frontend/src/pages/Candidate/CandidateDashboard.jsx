@@ -145,7 +145,7 @@ const CandidateDashboard = () => {
             {resume && (
               <div className="rounded-[1.5rem] bg-slate-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Current file</p>
-                <a href={resume.file_url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+                <a href={`/api/resumes/view/${user?.id}`} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
                   Open uploaded resume
                   <ExternalLink className="h-4 w-4" />
                 </a>

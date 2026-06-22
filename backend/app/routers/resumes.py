@@ -3,6 +3,7 @@ from fastapi import UploadFile
 from fastapi import File
 from fastapi import Depends
 from fastapi import HTTPException
+from fastapi.responses import Response
 
 from sqlalchemy.orm import Session
 
@@ -21,6 +22,7 @@ from app.routers.auth import (
 )
 
 import json
+import requests
 
 router = APIRouter()
 
@@ -96,6 +98,58 @@ def get_candidate_resume(
         )
 
     return resume
+
+
+# Serve PDF File
+@router.get("/view/{candidate_id}")
+def view_resume_pdf(
+    candidate_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+
+    if (
+        current_user.role == "applicant"
+        and current_user.id != candidate_id
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="You can only view your own resume"
+        )
+
+    resume = (
+        db.query(Resume)
+        .filter(
+            Resume.candidate_id == candidate_id
+        )
+        .first()
+    )
+
+    if not resume:
+        raise HTTPException(
+            status_code=404,
+            detail="Resume not found"
+        )
+
+    try:
+        response = requests.get(resume.file_url)
+        response.raise_for_status()
+        
+        return Response(
+            content=response.content,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'inline; filename="resume_{candidate_id}.pdf"',
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET",
+                "Access-Control-Allow-Headers": "*"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to load PDF: {str(e)}"
+        )
 
 
 # Parse Resume
