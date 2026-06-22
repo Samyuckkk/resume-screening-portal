@@ -41,9 +41,9 @@ const ScheduleInterview = () => {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link to="/recruiter" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800"><ArrowLeft className="h-4 w-4" />Back to dashboard</Link>
-      <PageHeader eyebrow="Interview scheduler" title="Book the next conversation" description="Plan a candidate session with the same interview creation flow, now in a more polished responsive layout." />
+    <div className="mx-auto max-w-4xl space-y-6 px-4 py-6 lg:px-6">
+      <Link to="/recruiter" className="inline-flex items-center gap-2 text-sm text-[#717b9e] hover:text-[#457eff]"><ArrowLeft className="h-4 w-4" />Back to dashboard</Link>
+      <PageHeader eyebrow="Schedule Interview" title="Book an interview" description="Set date, time, and meeting link for the candidate." />
       <SectionCard className="space-y-6">
         {application && (
           <div className="grid gap-4 rounded-[1.75rem] bg-slate-50 p-5 md:grid-cols-2">
@@ -55,16 +55,25 @@ const ScheduleInterview = () => {
           <div className="grid gap-5 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Interview date</label>
-              <div className="relative"><Calendar className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="field pl-11" required /></div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-slate-400 shrink-0" />
+                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="field !px-3.5" required />
+              </div>
             </div>
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Interview time</label>
-              <div className="relative"><Clock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="field pl-11" required /></div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-slate-400 shrink-0" />
+                <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="field !px-3.5" required />
+              </div>
             </div>
           </div>
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Meeting link</label>
-            <div className="relative"><Video className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="url" value={meetingLink} onChange={(e) => setMeetingLink(e.target.value)} className="field pl-11" placeholder="https://meet.google.com/..." /></div>
+            <div className="flex items-center gap-2">
+              <Video className="h-4 w-4 text-slate-400 shrink-0" />
+              <input type="url" value={meetingLink} onChange={(e) => setMeetingLink(e.target.value)} className="field !px-3.5" placeholder="https://meet.google.com/..." />
+            </div>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <Link to="/recruiter" className="btn-secondary">Cancel</Link>

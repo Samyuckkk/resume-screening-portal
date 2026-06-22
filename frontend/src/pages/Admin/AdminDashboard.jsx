@@ -33,8 +33,8 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <PageHeader eyebrow="Admin command center" title="Monitor platform health and activity" description="Keep an eye on jobs, applications, interviews, and parser operations from a premium operations dashboard." />
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 lg:px-6">
+      <PageHeader eyebrow="Admin" title="Platform overview" description="Monitor jobs, applications, interviews, and resume parsing activity." />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={Briefcase} label="Jobs" value={isJobsLoading ? '...' : jobs?.length || 0} />
         <StatCard icon={Users} label="Applications" value={isAppsLoading ? '...' : applications?.length || 0} tone="violet" />
@@ -48,7 +48,10 @@ const AdminDashboard = () => {
               <h2 className="text-2xl font-bold text-slate-900">User directory</h2>
               <p className="mt-2 text-sm leading-7 text-slate-500">Search the mock operational roster used by the current admin surface.</p>
             </div>
-            <div className="relative w-full md:max-w-xs"><Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={userSearch} onChange={(e) => setUserSearch(e.target.value)} className="field pl-11" placeholder="Search users..." /></div>
+            <div className="relative w-full md:max-w-xs flex items-center gap-2">
+              <Search className="h-4 w-4 text-slate-400 shrink-0" />
+              <input value={userSearch} onChange={(e) => setUserSearch(e.target.value)} className="field !px-3.5" placeholder="Search users..." />
+            </div>
           </div>
           <div className="grid gap-4">
             {filteredUsers.map((user) => (

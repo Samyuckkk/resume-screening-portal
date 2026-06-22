@@ -41,9 +41,9 @@ const ResumeParserDashboard = () => {
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <Link to="/admin" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800"><ArrowLeft className="h-4 w-4" />Back to dashboard</Link>
-      <PageHeader eyebrow="Parser studio" title="Run and inspect resume parsing" description="Keep the exact parser behavior while giving admins a more polished queue and output console." />
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 lg:px-6">
+      <Link to="/admin" className="inline-flex items-center gap-2 text-sm text-[#717b9e] hover:text-[#457eff]"><ArrowLeft className="h-4 w-4" />Back to dashboard</Link>
+      <PageHeader eyebrow="Resume Parser" title="AI Resume Parsing" description="Parse resumes to extract skills, education, and experience." />
       <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         <SectionCard className="space-y-5">
           <div>

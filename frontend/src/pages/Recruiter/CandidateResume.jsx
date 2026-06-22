@@ -52,8 +52,8 @@ const CandidateResume = () => {
   const experience = parseJsonData(resume.experience);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
-      <Link to="/recruiter" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800"><ArrowLeft className="h-4 w-4" />Back to dashboard</Link>
+    <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 lg:px-6">
+      <Link to="/recruiter" className="inline-flex items-center gap-2 text-sm text-[#717b9e] hover:text-[#457eff]"><ArrowLeft className="h-4 w-4" />Back to dashboard</Link>
       <PageHeader
         eyebrow="Candidate resume"
         title="Structured resume review"

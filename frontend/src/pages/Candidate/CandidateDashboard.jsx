@@ -87,11 +87,11 @@ const CandidateDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 lg:px-6">
       <PageHeader
-        eyebrow="Candidate hub"
-        title={`Welcome back, ${user?.name}`}
-        description="Track your resume intelligence, stay on top of every application, and keep interviews organized in one guided workspace."
+        eyebrow="My Recruvo"
+        title={`Hello, ${user?.name}`}
+        description="Manage your resume, track applications, and view interview schedules — all in one place."
       />
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -100,9 +100,9 @@ const CandidateDashboard = () => {
         <StatCard icon={Calendar} label="Interviews" value={candidateInterviews.length} tone="amber" hint="Scheduled sessions ahead" />
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <TabButton active={activeTab === 'resume'} icon={FileText} onClick={() => setActiveTab('resume')}>Resume</TabButton>
-        <TabButton active={activeTab === 'applications'} icon={Layers} onClick={() => setActiveTab('applications')}>Applications</TabButton>
+      <div className="flex flex-wrap gap-1 border-b border-[#e8e8e8]">
+        <TabButton active={activeTab === 'resume'} icon={FileText} onClick={() => setActiveTab('resume')}>My Resume</TabButton>
+        <TabButton active={activeTab === 'applications'} icon={Layers} onClick={() => setActiveTab('applications')}>Applied Jobs</TabButton>
         <TabButton active={activeTab === 'interviews'} icon={Calendar} onClick={() => setActiveTab('interviews')}>Interviews</TabButton>
       </div>
 
