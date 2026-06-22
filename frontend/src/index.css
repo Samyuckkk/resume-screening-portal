@@ -64,7 +64,7 @@
   }
 }
 
-/* Legacy class aliases — kept for compatibility */
+/* Legacy class aliases - kept for compatibility */
 .glass-panel,
 .surface-card {
   background: var(--bg-white);
