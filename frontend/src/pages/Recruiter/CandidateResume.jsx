@@ -58,7 +58,7 @@ const CandidateResume = () => {
         eyebrow="Candidate resume"
         title="Structured resume review"
         description="Inspect parsed candidate details and trigger parsing when you need a fresh extraction."
-        action={<div className="flex flex-wrap gap-3">{user && (user.role === 'recruiter' || user.role === 'admin') && <button type="button" onClick={handleParse} disabled={parseResumeMutation.isPending} className="btn-danger">{parseResumeMutation.isPending ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}<span>{parseResumeMutation.isPending ? 'Parsing...' : 'AI parse resume'}</span></button>}<a href={resume.file_url} target="_blank" rel="noreferrer" className="btn-secondary"><ExternalLink className="h-4 w-4" />Open PDF</a></div>}
+        action={<div className="flex flex-wrap gap-3">{user && (user.role === 'recruiter' || user.role === 'admin') && <button type="button" onClick={handleParse} disabled={parseResumeMutation.isPending} className="btn-danger">{parseResumeMutation.isPending ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}<span>{parseResumeMutation.isPending ? 'Parsing...' : 'AI parse resume'}</span></button>}<a href={`/api/resumes/view/${candidate_id}`} target="_blank" rel="noreferrer" className="btn-secondary"><ExternalLink className="h-4 w-4" />Open PDF</a></div>}
       />
       <SectionCard className="space-y-6">
         <div className="space-y-3">
